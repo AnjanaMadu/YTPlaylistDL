@@ -5,14 +5,19 @@ import asyncio
 @Client.on_message(filters.command("start"))
 async def start_msg(client, message):
 
-	makup = [InlineKeyboardButton("Help", callback_data=f"helptxt_{k.message_id}"),
-					InlineKeyboardButton("About", callback_data=f"abouttxt_{k.message_id}")]
+	kk = int(message.message_id) + 1
+	keyb = [
+		InlineKeyboardButton("Help", callback_data=f"helptxt_{str(kk)}"),
+		InlineKeyboardButton("About", callback_data=f"abouttxt_{str(kk)}")
+	]
+	reply_markup = InlineKeyboardMarkup(keyb)
 
-	k = await client.send_message(message.chat.id, "...", reply_to_message_id=message.message_id)
-	await k.edit(
+
+	await client.send_message(
+		message.chat.id,
 		f"Hi {message.from_user.mention},If you need any help, Just click help button.\n\nProject by @Harp_Tech",
-		reply_markup=makup
-	)
+		reply_markup=reply_markup,
+		reply_to_message_id=message.message_id)
 
 @Client.on_callback_query()
 async def cb_handler(client, message):

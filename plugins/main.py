@@ -187,7 +187,6 @@ async def download_video(client, message):
     return
   c_time = time.time()
   await msg.edit("`Downloaded.`")
-  os.system('cd {} && ls').format(out_folder)
   if song:
     for single_file in filename:
       if os.path.exists(single_file):
