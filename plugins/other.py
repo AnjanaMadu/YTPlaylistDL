@@ -8,8 +8,8 @@ async def start_msg(client, message):
 	await k.edit(
 		f"Hi {message.from_user.mention},If you need any help, Just click help button.\n\nProject by @Harp_Tech",
 		reply_markup=[
-			InlineKeyboardButton("Help", callback_data=f"helptxt_{k.id}"),
-			InlineKeyboardButton("About", callback_data=f"abouttxt_{k.id}")
+			InlineKeyboardButton("Help", callback_data=f"helptxt_{k.message_id}"),
+			InlineKeyboardButton("About", callback_data=f"abouttxt_{k.message_id}")
 		]
 	)
 
