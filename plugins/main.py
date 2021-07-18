@@ -12,6 +12,7 @@ from asyncio import sleep
 tdb = {}
 import pyrogram
 from pyrogram import Client, filters
+from pyrogram.errors.exceptions.bad_request_400 import MessageNotModified 
 
 import shutil
 
@@ -40,12 +41,12 @@ async def progress_for_pyrogram(
     elapsed_time = time_formatter(milliseconds=elapsed_time)
     estimated_total_time = time_formatter(milliseconds=estimated_total_time)
 
-    progress = "[{0}{1}] \n○ <b>𝗣𝗲𝗿𝗰𝗲𝗻𝘁𝗮𝗴𝗲 :</b> {2}%\n○ <b>𝗖𝗼𝗺𝗽𝗹𝗲𝘁𝗲𝗱 :</b> ".format(
+    progress = "[{0}{1}] \n○ <b>Percentage :</b> {2}%\n○ <b>Completed :</b> ".format(
       ''.join(["█" for i in range(math.floor(percentage / 5))]),
       ''.join(["░" for i in range(20 - math.floor(percentage / 5))]),
-      round(percentage, 2))
+      round(percentage, 3))
 
-    tmp = progress + "{0} of {1}\n○ <b>𝗦𝗽𝗲𝗲𝗱 :</b> {2}/s\n○ <b>𝗧𝗶𝗺𝗲 𝗟𝗲𝗳𝘁 :</b> {3}\n".format(
+    tmp = progress + "{0} of {1}\n○ <b>Speed :</b> {2}/s\n○ <b>ETA :</b> {3}\n".format(
       humanbytes(current),
       humanbytes(total),
       humanbytes(speed),
@@ -58,7 +59,7 @@ async def progress_for_pyrogram(
           tmp
         )
       )
-    except:
+    except MessageNotModified:
       pass
 
 # --- HUMANBYTES DEF --- #
@@ -194,7 +195,6 @@ async def download_video(client, message):
             thumb_image_path = None
           try:
             ytdl_data_name_audio = os.path.basename(single_file)
-            print(ytdl_data_name_audio)
             tnow = time.time()
             await client.send_audio(
               message.chat.id,
@@ -202,13 +202,14 @@ async def download_video(client, message):
               caption=f"`{ytdl_data_name_audio}`",
               thumb=thumb_image_path,
               progress=progress_for_pyrogram,
-              progress_args=("Uploading...", msg, tnow)
+              progress_args=("**__Uploading...__**", msg, tnow)
             )
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
+    await del_old_msg_send_msg(msg)
 
   if video:
     for single_file in filename:
@@ -221,7 +222,6 @@ async def download_video(client, message):
             thumb_image_path = None
           try:
             ytdl_data_name_audio = os.path.basename(single_file)
-            print(ytdl_data_name_audio)
             tnow = time.time()
             await client.send_video(
               message.chat.id,
@@ -229,13 +229,14 @@ async def download_video(client, message):
               caption=f"`{ytdl_data_name_audio}`",
               thumb=thumb_image_path,
               progress=progress_for_pyrogram,
-              progress_args=("Uploading...", msg, tnow)
+              progress_args=("**__Uploading...__**", msg, tnow)
             )
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
+    await del_old_msg_send_msg(msg)
     
 
 def get_lst_of_files(input_directory, output_lst):
@@ -247,5 +248,8 @@ def get_lst_of_files(input_directory, output_lst):
     output_lst.append(current_file_name)
   return output_lst
 
+async def del_old_msg_send_msg(msg)
+  await msg.delete()
+  await client.send_message(message.chat.id, "`Playlist Upload Success!`")
  
 print("> Bot Started ")
