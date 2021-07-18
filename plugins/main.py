@@ -96,9 +96,9 @@ async def download_video(client, message):
   type = message.text.split(None, 1)[1]
 
   if "playlist?list=" in url:
-    msg = await message.reply("`Preparing to download...`")
+    msg = await client.send_message(message.chat.id, '`Preparing to download...`', reply_to_message_id=message.message.id)
   else:
-    return await message.reply('`I think this is invalid link...`')
+    return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message.id)
 
   out_folder = f"downloads/{message.from_user.id}/"
   if not os.path.isdir(out_folder):
@@ -279,4 +279,4 @@ def get_metadata(file):
   return fduration, fwidth, fheight
 
 
- print("> Bot Started ")
+print("> Bot Started ")
