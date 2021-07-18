@@ -9,7 +9,8 @@ from youtube_dl.utils import (DownloadError, ContentTooShortError,
                 MaxDownloadsReached, PostProcessingError,
                 UnavailableVideoError, XAttrMetadataError)
 from asyncio import sleep
-tdb = {}
+from hachoir.metadata import extractMetadata
+from hachoir.parser import createParser
 import pyrogram
 from pyrogram import Client, filters
 from pyrogram.errors.exceptions.bad_request_400 import MessageNotModified 
@@ -28,7 +29,8 @@ async def progress_for_pyrogram(
   total,
   ud_type,
   message,
-  start
+  start,
+  filename
 ):
   now = time.time()
   diff = now - start
@@ -40,13 +42,13 @@ async def progress_for_pyrogram(
     estimated_total_time = elapsed_time + time_to_completion
     elapsed_time = time_formatter(milliseconds=elapsed_time)
     estimated_total_time = time_formatter(milliseconds=estimated_total_time)
-
-    progress = "[{0}{1}] \n○ <b>Percentage :</b> {2}%\n○ <b>Completed :</b> ".format(
+    progress = "○ **Name :** `{}`".format(filename)
+    progress += "[{0}{1}] \n○ **Percentage :** `{2}%`\n○ **Completed :** ".format(
       ''.join(["█" for i in range(math.floor(percentage / 5))]),
       ''.join(["░" for i in range(20 - math.floor(percentage / 5))]),
-      round(percentage, 3))
+      round(percentage, 1))
 
-    tmp = progress + "{0} of {1}\n○ <b>Speed :</b> {2}/s\n○ <b>ETA :</b> {3}\n".format(
+    tmp = progress + "`{0}` of ``{1}\n○ **Speed :** `{2}/s`\n○ **ETA :** `{3}`\n".format(
       humanbytes(current),
       humanbytes(total),
       humanbytes(speed),
@@ -80,11 +82,11 @@ def time_formatter(milliseconds: int) -> str:
   minutes, seconds = divmod(seconds, 60)
   hours, minutes = divmod(minutes, 60)
   days, hours = divmod(hours, 24)
-  tmp = ((str(days) + "d, ") if days else "") + \
-    ((str(hours) + "h, ") if hours else "") + \
-    ((str(minutes) + "m, ") if minutes else "") + \
-    ((str(seconds) + "s, ") if seconds else "") + \
-    ((str(milliseconds) + "ms, ") if milliseconds else "")
+  tmp = ((str(days) + "days, ") if days else "") + \
+    ((str(hours) + "hours, ") if hours else "") + \
+    ((str(minutes) + "minites, ") if minutes else "") + \
+    ((str(seconds) + "seconds, ") if seconds else "") + \
+    ((str(milliseconds) + "milliseconds, ") if milliseconds else "")
   return tmp[:-2]
 
 
@@ -185,6 +187,7 @@ async def download_video(client, message):
     return
   c_time = time.time()
   await msg.edit("`Downloaded.`")
+  os.system('cd {} && ls').format(out_folder)
   if song:
     for single_file in filename:
       if os.path.exists(single_file):
@@ -197,13 +200,16 @@ async def download_video(client, message):
           try:
             ytdl_data_name_audio = os.path.basename(single_file)
             tnow = time.time()
+            fduration, fwidth, fheight = get_metadata(single_file)
             await client.send_audio(
               message.chat.id,
               single_file,
-              caption=f"💫 File: `{ytdl_data_name_audio}`",
+              caption=f"**File:** `{ytdl_data_name_audio}`",
               thumb=thumb_image_path,
+              supports_streaming=True,
+              duration=fduration,
               progress=progress_for_pyrogram,
-              progress_args=("**__Uploading...__**\n• **File :**`{ytdl_data_name_audio}`", msg, tnow)
+              progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_audio)
             )
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
@@ -224,13 +230,18 @@ async def download_video(client, message):
           try:
             ytdl_data_name_video = os.path.basename(single_file)
             tnow = time.time()
+            fduration, fwidth, fheight = get_metadata(single_file)
             await client.send_video(
               message.chat.id,
               single_file,
-              caption=f"💫 File: `{ytdl_data_name_video}`",
+              caption=f"**File:** `{ytdl_data_name_video}`",
               thumb=thumb_image_path,
+              supports_streaming=True,
+              duration=fduration,
+              width=fwidth,
+              height=fheight,
               progress=progress_for_pyrogram,
-              progress_args=("**__Uploading...__**\n• **File :**`{ytdl_data_name_video}`", msg, tnow)
+              progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_video)
             )
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
@@ -252,5 +263,20 @@ def get_lst_of_files(input_directory, output_lst):
 async def del_old_msg_send_msg(msg, client, message):
   await msg.delete()
   await client.send_message(message.chat.id, "`Playlist Upload Success!`")
- 
-print("> Bot Started ")
+
+def get_metadata(file):
+  fwidth = None
+  fheight = None
+  fduration = None
+  metadata = extractMetadata(createParser(file))
+  if metadata is not None:
+    if metadata.has("duration"):
+      fduration = metadata.get('duration').seconds
+    if metadata.has("width"):
+      fwidth = metadata.get("width")
+    if metadata.has("height"):
+      fheight = metadata.get("height")
+  return fduration, fwidth, fheight
+
+
+ print("> Bot Started ")
