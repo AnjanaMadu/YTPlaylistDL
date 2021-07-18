@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import asyncio
 
-@Client.on_message(filters.command(pattern="start"))
+@Client.on_message(filters.command("start"))
 async def start_msg(client, message):
 	await client.send_message(
 		message.chat.id,
@@ -17,4 +17,5 @@ async def start_msg(client, message):
 @client.on_callback_query()
 async def cb_handler(client, message):
 	cb_income_dt = int(message.data.split("_", 1)[1])
+	print(cb_income_dt)
 	await client.send_message(message.chat.id, "Hello")
