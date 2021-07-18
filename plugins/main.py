@@ -99,7 +99,7 @@ async def download_video(client, message):
 
   out_folder = f"/downloads/{message.from_user.id}/"
   if not os.path.exists(out_folder):
-    os.makedirs(out_folder)
+    os.mkdir(out_folder)
 
   if type == "audio":
     opts = {
