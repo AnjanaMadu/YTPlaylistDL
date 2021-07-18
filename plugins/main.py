@@ -200,17 +200,17 @@ async def download_video(client, message):
             await client.send_audio(
               message.chat.id,
               single_file,
-              caption=f"`{ytdl_data_name_audio}`",
+              caption=f"💫 File: `{ytdl_data_name_audio}`",
               thumb=thumb_image_path,
               progress=progress_for_pyrogram,
-              progress_args=("**__Uploading...__**", msg, tnow)
+              progress_args=("**__Uploading...__**\n• **File :**`{ytdl_data_name_audio}`", msg, tnow)
             )
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
-    await del_old_msg_send_msg(msg, client)
+    await del_old_msg_send_msg(msg, client, message)
 
   if video:
     for single_file in filename:
@@ -222,22 +222,22 @@ async def download_video(client, message):
           elif os.path.exists(thumb_image_path):
             thumb_image_path = None
           try:
-            ytdl_data_name_audio = os.path.basename(single_file)
+            ytdl_data_name_video = os.path.basename(single_file)
             tnow = time.time()
             await client.send_video(
               message.chat.id,
               single_file,
-              caption=f"`{ytdl_data_name_audio}`",
+              caption=f"💫 File: `{ytdl_data_name_video}`",
               thumb=thumb_image_path,
               progress=progress_for_pyrogram,
-              progress_args=("**__Uploading...__**", msg, tnow)
+              progress_args=("**__Uploading...__**\n• **File :**`{ytdl_data_name_video}`", msg, tnow)
             )
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
-    await del_old_msg_send_msg(msg, client)
+    await del_old_msg_send_msg(msg, client, message)
     
 
 def get_lst_of_files(input_directory, output_lst):
@@ -249,7 +249,7 @@ def get_lst_of_files(input_directory, output_lst):
     output_lst.append(current_file_name)
   return output_lst
 
-async def del_old_msg_send_msg(msg, client):
+async def del_old_msg_send_msg(msg, client, message):
   await msg.delete()
   await client.send_message(message.chat.id, "`Playlist Upload Success!`")
  
