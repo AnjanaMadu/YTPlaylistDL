@@ -2,7 +2,7 @@ from pyrogram import Client, filters
 from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 import asyncio
 
-@client.on_message(filters.command(pattern="start"))
+@Client.on_message(filters.command(pattern="start"))
 async def start_msg(client, message):
 	await client.send_message(
 		message.chat.id,
