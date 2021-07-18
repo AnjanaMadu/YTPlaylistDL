@@ -248,7 +248,7 @@ def get_lst_of_files(input_directory, output_lst):
     output_lst.append(current_file_name)
   return output_lst
 
-async def del_old_msg_send_msg(msg)
+async def del_old_msg_send_msg(msg):
   await msg.delete()
   await client.send_message(message.chat.id, "`Playlist Upload Success!`")
  
