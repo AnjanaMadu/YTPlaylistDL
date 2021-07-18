@@ -14,7 +14,7 @@ async def start_msg(client, message):
 		reply_to_message_id=message.message.id
 	)
 
-@client.on_callback_query()
+@Client.on_callback_query()
 async def cb_handler(client, message):
 	cb_income_dt = int(message.data.split("_", 1)[1])
 	print(cb_income_dt)
