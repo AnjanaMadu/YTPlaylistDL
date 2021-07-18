@@ -96,9 +96,9 @@ async def download_video(client, message):
   type = message.text.split(None, 1)[1]
 
   if "playlist?list=" in url:
-    msg = await client.send_message(message.chat.id, '`Preparing to download...`', reply_to_message_id=message.message.id)
+    msg = await client.send_message(message.chat.id, '`Preparing to download...`', reply_to_message_id=message.message_id)
   else:
-    return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message.id)
+    return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
 
   out_folder = f"downloads/{message.from_user.id}/"
   if not os.path.isdir(out_folder):
