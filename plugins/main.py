@@ -97,9 +97,9 @@ async def download_video(client, message):
   else:
     return await message.reply('`I think this is invalid link...`')
 
-  out_folder = f"/downloads/{message.from_user.id}/"
-  if not os.path.exists(out_folder):
-    os.mkdir(out_folder)
+  out_folder = f"downloads/{message.from_user.id}/"
+  if not os.path.isdir(out_folder):
+    os.makedirs(out_folder)
 
   if type == "audio":
     opts = {
