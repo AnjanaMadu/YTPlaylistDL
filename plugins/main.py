@@ -201,14 +201,11 @@ async def download_video(client, message):
               single_file,
               caption=f"`{ytdl_data_name_audio}`",
               thumb=thumb_image_path,
-              progress=progress,
+              progress=progress_for_pyrogram,
               progress_args=("Uploading...", msg, tnow)
             )
           except Exception as e:
-            await msg.edit(
-              message.chat.id,
-              "{} caused `{}`".format(single_file, str(e)),
-            )
+            await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
@@ -231,14 +228,11 @@ async def download_video(client, message):
               single_file,
               caption=f"`{ytdl_data_name_audio}`",
               thumb=thumb_image_path,
-              progress=progress,
+              progress=progress_for_pyrogram,
               progress_args=("Uploading...", msg, tnow)
             )
           except Exception as e:
-            await msg.edit(
-              message.chat.id,
-              "{} caused `{}`".format(single_file, str(e)),
-            )
+            await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
