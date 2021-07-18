@@ -151,6 +151,7 @@ async def download_video(client, message):
   try:
     await msg.edit("`Downloading Playlist...`")
     with YoutubeDL(opts) as ytdl:
+      ytdl.cache.remove()
       ytdl_data = ytdl.extract_info(url)
     filename = sorted(get_lst_of_files(out_folder, []))
   except DownloadError as DE:
