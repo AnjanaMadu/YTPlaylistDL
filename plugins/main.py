@@ -209,7 +209,7 @@ async def download_video(client, message):
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
-    await del_old_msg_send_msg(msg)
+    await del_old_msg_send_msg(msg, client)
 
   if video:
     for single_file in filename:
@@ -236,7 +236,7 @@ async def download_video(client, message):
             continue
           os.remove(single_file)
     shutil.rmtree(out_folder)
-    await del_old_msg_send_msg(msg)
+    await del_old_msg_send_msg(msg, client)
     
 
 def get_lst_of_files(input_directory, output_lst):
@@ -248,7 +248,7 @@ def get_lst_of_files(input_directory, output_lst):
     output_lst.append(current_file_name)
   return output_lst
 
-async def del_old_msg_send_msg(msg):
+async def del_old_msg_send_msg(msg, client):
   await msg.delete()
   await client.send_message(message.chat.id, "`Playlist Upload Success!`")
  
