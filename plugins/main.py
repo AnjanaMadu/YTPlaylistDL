@@ -320,8 +320,8 @@ def get_thumb_name(file):
         im = Image.open(f"{os.path.splitext(file)[0]}.webp").convert("RGB")
         im.save(f"{os.path.splitext(file)[0]}.jpg", "jpeg")
         thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
-      except:
-        pass
+    except:
+      pass
         return thumb_image_path
 
 print("> Bot Started ")
