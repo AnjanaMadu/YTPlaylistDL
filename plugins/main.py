@@ -207,7 +207,6 @@ async def download_video(client, message):
               single_file,
               caption=f"**File:** `{ytdl_data_name_audio}`",
               thumb=thumb_image_path,
-              supports_streaming=True,
               duration=fduration,
               progress=progress_for_pyrogram,
               progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_audio)
