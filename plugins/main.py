@@ -200,7 +200,7 @@ async def download_video(client, message):
             ytdl_data_name_audio = os.path.basename(single_file)
             tnow = time.time()
             fduration, fwidth, fheight = get_metadata(single_file)
-            await message.message.reply_chat_action("upload_audio")
+            await message.reply_chat_action("upload_audio")
             await client.send_audio(
               message.chat.id,
               single_file,
@@ -228,7 +228,7 @@ async def download_video(client, message):
             ytdl_data_name_video = os.path.basename(single_file)
             tnow = time.time()
             fduration, fwidth, fheight = get_metadata(single_file)
-            await message.message.reply_chat_action("upload_video")
+            await message.reply_chat_action("upload_video")
             await client.send_video(
               message.chat.id,
               single_file,
