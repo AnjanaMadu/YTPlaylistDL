@@ -298,7 +298,8 @@ async def pyro_fsub(c, message, fsub):
       )
     )
     return False
-  except Exception:
+  except Exception as kk:
+    print(kk)
     await c.send_message(
       chat_id=message.chat.id,
       text="Something went Wrong. Contact my [Support Group](https://t.me/harp_chat).",
