@@ -322,6 +322,6 @@ def get_thumb_name(file):
         thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
     except:
       pass
-        return thumb_image_path
+      return thumb_image_path
 
 print("> Bot Started ")
