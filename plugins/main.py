@@ -109,7 +109,7 @@ async def download_video(client, message):
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
 
-  out_folder = f"downloads/{uuid.uuid4()}/"
+  out_folder = f"/downloads/{uuid.uuid4()}/"
   if not os.path.isdir(out_folder):
     os.makedirs(out_folder)
 
@@ -216,6 +216,7 @@ async def download_video(client, message):
             continue
           await message.reply_chat_action("cancel")
           os.remove(single_file)
+    LOGGER.info(f"Clearing {out_folder}")
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
 
@@ -246,6 +247,7 @@ async def download_video(client, message):
             continue
           await message.reply_chat_action("cancel")
           os.remove(single_file)
+    LOGGER.info(f"Clearing {out_folder}")
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
     
