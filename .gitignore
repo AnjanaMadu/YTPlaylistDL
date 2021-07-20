@@ -1,0 +1,6 @@
+__pycache__
+run.py
+*.session
+*.session*
+x.py
+downloads

@@ -4,23 +4,43 @@ import asyncio
 
 @Client.on_message(filters.command("start"))
 async def start_msg(client, message):
-
-	kk = int(message.message_id) + 1
-	keyb = [
-		InlineKeyboardButton("Help", callback_data=f"helptxt_{str(kk)}"),
-		InlineKeyboardButton("About", callback_data=f"abouttxt_{str(kk)}")
-	]
-	reply_markup = InlineKeyboardMarkup(keyb)
-
-
-	await client.send_message(
-		message.chat.id,
+	await message.reply_text(
 		f"Hi {message.from_user.mention},If you need any help, Just click help button.\n\nProject by @Harp_Tech",
-		reply_markup=reply_markup,
-		reply_to_message_id=message.message_id)
+		reply_markup=InlineKeyboardMarkup(
+				[[
+					InlineKeyboardButton("🛠 Help", callback_data=f"help"),
+					InlineKeyboardButton("🧰 About", callback_data=f"about")
+				]]
+			),
+		quote=True)
 
 @Client.on_callback_query()
-async def cb_handler(client, message):
-	cb_income_dt = int(message.data.split("_", 1)[1])
-	print(cb_income_dt)
-	await client.send_message(message.chat.id, "Hello")
+async def cb_handler(client, update):
+	cb_data = update.data
+	
+	if "help" in cb_data:
+		await update.message.edit_text("Just Send URL with Format.(Audio/Video)\nExample: `https://youtube.com/playlist?list=xxxxxxxxxx audio`\n\nPowered by @Harp_Tech",
+			reply_markup=InlineKeyboardMarkup(
+				[[
+					InlineKeyboardButton("🧰 About", callback_data=f"about"),
+					InlineKeyboardButton("🔙 Back", callback_data=f"back")
+				]]
+			))
+	
+	if "about" in cb_data:
+		await update.message.edit_text("Language: Python\nFramework: Pyrogram\nEngine: YTDL\nCorded By: @Anjana_Ma\n\nPowered by @Harp_Tech",
+			reply_markup=InlineKeyboardMarkup(
+				[[
+					InlineKeyboardButton("🛠 Help", callback_data=f"help"),
+					InlineKeyboardButton("🔙 Back", callback_data=f"back")
+				]]
+			))
+	
+	if "back" in cb_data:
+		await update.message.edit_text(f"Hi {update.from_user.mention},If you need any help, Just click help button.\n\nProject by @Harp_Tech",
+			reply_markup=InlineKeyboardMarkup(
+				[[
+					InlineKeyboardButton("🛠 Help", callback_data=f"help"),
+					InlineKeyboardButton("🧰 About", callback_data=f"about")
+				]]
+			))

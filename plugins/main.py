@@ -9,11 +9,13 @@ from youtube_dl.utils import (DownloadError, ContentTooShortError,
                 MaxDownloadsReached, PostProcessingError,
                 UnavailableVideoError, XAttrMetadataError)
 from asyncio import sleep
+from PIL import Image
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 import pyrogram
 from pyrogram import Client, filters
-from pyrogram.errors.exceptions.bad_request_400 import MessageNotModified 
+from pyrogram.errors import MessageNotModified 
+from pyrogram.errors import UserNotParticipant, UserBannedInChannel
 
 import shutil
 
@@ -42,13 +44,13 @@ async def progress_for_pyrogram(
     estimated_total_time = elapsed_time + time_to_completion
     elapsed_time = time_formatter(milliseconds=elapsed_time)
     estimated_total_time = time_formatter(milliseconds=estimated_total_time)
-    progress = "○ **Name :** `{}`".format(filename)
+    progress = "○ **Name :** `{}`\n".format(filename)
     progress += "[{0}{1}] \n○ **Percentage :** `{2}%`\n○ **Completed :** ".format(
       ''.join(["█" for i in range(math.floor(percentage / 5))]),
       ''.join(["░" for i in range(20 - math.floor(percentage / 5))]),
       round(percentage, 1))
 
-    tmp = progress + "`{0}` of ``{1}\n○ **Speed :** `{2}/s`\n○ **ETA :** `{3}`\n".format(
+    tmp = progress + "`{0}` of `{1}`\n○ **Speed :** `{2}/s`\n○ **ETA :** `{3}`\n".format(
       humanbytes(current),
       humanbytes(total),
       humanbytes(speed),
@@ -92,6 +94,11 @@ def time_formatter(milliseconds: int) -> str:
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def download_video(client, message):
+
+  fsub = "@harp_tech"
+  if not (await pyro_fsub(client, message, fsub) == True):
+    return
+
   url = message.text.split(None, 1)[0]
   type = message.text.split(None, 1)[1]
 
@@ -157,49 +164,40 @@ async def download_video(client, message):
       ytdl_data = ytdl.extract_info(url)
     filename = sorted(get_lst_of_files(out_folder, []))
   except DownloadError as DE:
-    await msg.edit(f"`{str(DE)}`")
-    return
+    return await msg.edit(f"`{str(DE)}`")
   except ContentTooShortError:
-    await msg.edit("`The download content was too short.`")
-    return
+    return await msg.edit("`The download content was too short.`")
   except GeoRestrictedError:
-    await msg.edit(
+    return await msg.edit(
       "`Video is not available from your geographic location due to geographic restrictions imposed by a website.`"
     )
-    return
   except MaxDownloadsReached:
-    await msg.edit("`Max-downloads limit has been reached.`")
-    return
+    return await msg.edit("`Max-downloads limit has been reached.`")
   except PostProcessingError:
-    await msg.edit("`There was an error during post processing.`")
-    return
+    return await msg.edit("`There was an error during post processing.`")
   except UnavailableVideoError:
-    await msg.edit("`Media is not available in the requested format.`")
-    return
+    return await msg.edit("`Media is not available in the requested format.`")
   except XAttrMetadataError as XAME:
-    await msg.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
-    return
+    return await msg.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
   except ExtractorError:
-    await msg.edit("`There was an error during info extraction.`")
-    return
+    return await msg.edit("`There was an error during info extraction.`")
   except Exception as e:
-    await msg.edit(f"{str(type(e)): {str(e)}}")
-    return
+    return await msg.edit(f"{str(type(e)): {str(e)}}")
   c_time = time.time()
-  await msg.edit("`Downloaded.`")
+  try:
+    await msg.edit("`Downloaded.`")
+  except MessageNotModified:
+    pass
   if song:
     for single_file in filename:
       if os.path.exists(single_file):
         if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
-          thumb_image_path = f"{os.path.splitext(single_file)[0]}.jpg"
-          if not os.path.exists(thumb_image_path):
-            thumb_image_path = f"{os.path.splitext(single_file)[0]}.webp"
-          elif os.path.exists(thumb_image_path):
-            thumb_image_path = None
+          thumb_image_path = get_thumb_name(single_file)
           try:
             ytdl_data_name_audio = os.path.basename(single_file)
             tnow = time.time()
             fduration, fwidth, fheight = get_metadata(single_file)
+            await message.message.reply_chat_action("upload_audio")
             await client.send_audio(
               message.chat.id,
               single_file,
@@ -213,6 +211,7 @@ async def download_video(client, message):
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
+          await message.reply_chat_action("cancel")
           os.remove(single_file)
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
@@ -221,15 +220,12 @@ async def download_video(client, message):
     for single_file in filename:
       if os.path.exists(single_file):
         if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
-          thumb_image_path = f"{os.path.splitext(single_file)[0]}.jpg"
-          if not os.path.exists(thumb_image_path):
-            thumb_image_path = f"{os.path.splitext(single_file)[0]}.webp"
-          elif os.path.exists(thumb_image_path):
-            thumb_image_path = None
+          thumb_image_path = get_thumb_name(single_file)
           try:
             ytdl_data_name_video = os.path.basename(single_file)
             tnow = time.time()
             fduration, fwidth, fheight = get_metadata(single_file)
+            await message.message.reply_chat_action("upload_video")
             await client.send_video(
               message.chat.id,
               single_file,
@@ -245,6 +241,7 @@ async def download_video(client, message):
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
+          await message.reply_chat_action("cancel")
           os.remove(single_file)
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
@@ -277,5 +274,46 @@ def get_metadata(file):
       fheight = metadata.get("height")
   return fduration, fwidth, fheight
 
+async def pyro_fsub(c, message, fsub):
+  try:
+    user = await c.get_chat_member(fsub, message.chat.id)
+    if user.status == "kicked":
+      await c.send_message(
+        chat_id=message.chat.id,
+        text="Sorry, You are Banned to use me. Contact my [Support Group](https://t.me/harp_chat).",
+        parse_mode="markdown",
+        disable_web_page_preview=True
+      )
+        return True
+  except UserNotParticipant:
+    await c.send_message(
+      chat_id=message.chat.id,
+      text="**Please Join My Updates Channel to Use Me!**",
+      reply_markup=InlineKeyboardMarkup(
+        [
+          [
+            InlineKeyboardButton("Join Now", url=f"https://t.me/{fsub.replace("@", "")}")
+          ]
+        ]
+      )
+    )
+      return False
+  except Exception:
+    await c.send_message(
+      chat_id=message.chat.id,
+      text="Something went Wrong. Contact my [Support Group](https://t.me/harp_chat).",
+      parse_mode="markdown",
+      disable_web_page_preview=True)
+    return False
+
+def get_thumb_name(file):
+  thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
+  if not os.path.exists(thumb_image_path):
+    if os.path.exists(f"{os.path.splitext(file)[0]}.webp"):
+      im = Image.open(f"{os.path.splitext(file)[0]}.webp").convert("RGB")
+      im.save(f"{os.path.splitext(file)[0]}.jpg", "jpeg")
+    else:
+      thumb_image_path = None
+      return thumb_image_path
 
 print("> Bot Started ")

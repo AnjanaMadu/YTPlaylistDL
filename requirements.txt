@@ -3,3 +3,4 @@ hachoir
 pyrogram
 tgcrypto
 youtube_dl
+pillow
