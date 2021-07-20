@@ -1,4 +1,5 @@
 import os
+import uuid
 import time
 import math
 import asyncio
@@ -108,7 +109,7 @@ async def download_video(client, message):
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
 
-  out_folder = f"downloads/{message.from_user.id}/"
+  out_folder = f"downloads/{uuid.uuid4()}/"
   if not os.path.isdir(out_folder):
     os.makedirs(out_folder)
 

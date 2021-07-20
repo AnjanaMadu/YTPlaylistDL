@@ -4,3 +4,4 @@ pyrogram
 tgcrypto
 youtube_dl
 pillow
+uuid
