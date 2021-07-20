@@ -129,7 +129,7 @@ async def download_video(client, message):
         'preferredquality': '320',
       }],
       'outtmpl':out_folder + '%(title)s.%(ext)s',
-      'quiet':True,
+      'quiet':False,
       'logtostderr':False
     }
     video = False
@@ -153,7 +153,7 @@ async def download_video(client, message):
         'preferedformat': 'mp4'},],
       'outtmpl':out_folder + '%(title)s.%(ext)s',
       'logtostderr':False,
-      'quiet':True
+      'quiet':False
     }
     song = False
     video = True
