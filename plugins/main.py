@@ -14,7 +14,8 @@ from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 import pyrogram
 from pyrogram import Client, filters
-from pyrogram.errors import MessageNotModified 
+from pyrogram.errors import MessageNotModified
+from pyrogram.types import InlineKeyboardMarkup, InlineKeyboardButton
 from pyrogram.errors import UserNotParticipant, UserBannedInChannel
 
 import shutil
