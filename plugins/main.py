@@ -284,7 +284,7 @@ async def pyro_fsub(c, message, fsub):
         parse_mode="markdown",
         disable_web_page_preview=True
       )
-        return True
+    return True
   except UserNotParticipant:
     await c.send_message(
       chat_id=message.chat.id,
@@ -292,12 +292,12 @@ async def pyro_fsub(c, message, fsub):
       reply_markup=InlineKeyboardMarkup(
         [
           [
-            InlineKeyboardButton("Join Now", url=f"https://t.me/{fsub.replace("@", "")}")
+            InlineKeyboardButton("Join Now", url="https://t.me/harp_tech")
           ]
         ]
       )
     )
-      return False
+    return False
   except Exception:
     await c.send_message(
       chat_id=message.chat.id,
