@@ -87,10 +87,10 @@ def time_formatter(milliseconds: int) -> str:
   hours, minutes = divmod(minutes, 60)
   days, hours = divmod(hours, 24)
   tmp = ((str(days) + "days, ") if days else "") + \
-    ((str(hours) + "hours, ") if hours else "") + \
-    ((str(minutes) + "minites, ") if minutes else "") + \
-    ((str(seconds) + "seconds, ") if seconds else "") + \
-    ((str(milliseconds) + "milliseconds, ") if milliseconds else "")
+    ((str(hours) + " hours, ") if hours else "") + \
+    ((str(minutes) + " minites, ") if minutes else "") + \
+    ((str(seconds) + " seconds, ") if seconds else "") + \
+    ((str(milliseconds) + " milliseconds, ") if milliseconds else "")
   return tmp[:-2]
 
 
@@ -215,8 +215,8 @@ async def download_video(client, message):
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           await message.reply_chat_action("cancel")
-          os.remove(single_file)
-    LOGGER.info(f"Clearing {out_folder}")
+          #os.remove(single_file)
+    #LOGGER.info(f"Clearing {out_folder}")
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
 
@@ -314,10 +314,14 @@ async def pyro_fsub(c, message, fsub):
 
 def get_thumb_name(file):
   thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
+  print(thumb_image_path)
+  time.sleep(2)
   if not os.path.exists(thumb_image_path):
     if os.path.exists(f"{os.path.splitext(file)[0]}.webp"):
       im = Image.open(f"{os.path.splitext(file)[0]}.webp").convert("RGB")
       im.save(f"{os.path.splitext(file)[0]}.jpg", "jpeg")
+      print(thumb_image_path)
+      time.sleep(2)
     else:
       thumb_image_path = None
       return thumb_image_path
