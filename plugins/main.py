@@ -314,16 +314,14 @@ async def pyro_fsub(c, message, fsub):
 
 def get_thumb_name(file):
   thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
-  print(thumb_image_path)
-  time.sleep(2)
   if not os.path.exists(thumb_image_path):
-    if os.path.exists(f"{os.path.splitext(file)[0]}.webp"):
-      im = Image.open(f"{os.path.splitext(file)[0]}.webp").convert("RGB")
-      im.save(f"{os.path.splitext(file)[0]}.jpg", "jpeg")
-      print(thumb_image_path)
-      time.sleep(2)
-    else:
-      thumb_image_path = None
-      return thumb_image_path
+    try:
+      if os.path.exists(f"{os.path.splitext(file)[0]}.webp"):
+        im = Image.open(f"{os.path.splitext(file)[0]}.webp").convert("RGB")
+        im.save(f"{os.path.splitext(file)[0]}.jpg", "jpeg")
+        thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
+      except:
+        pass
+        return thumb_image_path
 
 print("> Bot Started ")
