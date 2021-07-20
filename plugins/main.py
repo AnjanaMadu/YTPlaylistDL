@@ -109,6 +109,7 @@ async def download_video(client, message):
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
 
+  shutil.rmtree("/downloads/")
   out_folder = f"/downloads/{uuid.uuid4()}/"
   if not os.path.isdir(out_folder):
     os.makedirs(out_folder)
@@ -215,8 +216,8 @@ async def download_video(client, message):
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
           await message.reply_chat_action("cancel")
-          #os.remove(single_file)
-    #LOGGER.info(f"Clearing {out_folder}")
+          os.remove(single_file)
+    LOGGER.info(f"Clearing {out_folder}")
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
 
@@ -321,6 +322,7 @@ def get_thumb_name(file):
         im.save(f"{os.path.splitext(file)[0]}.jpg", "jpeg")
         thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
     except:
+      thumb_image_path = None
       pass
       return thumb_image_path
 
