@@ -109,7 +109,7 @@ async def download_video(client, message):
 
   if "playlist?list=" in url:
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
-    if not "audio" or "video" == type:
+    if not type == "audio" or "video":
       return await msg.edit("Oof.. Format Incorrect.")
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
