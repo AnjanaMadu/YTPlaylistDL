@@ -93,22 +93,6 @@ def time_formatter(milliseconds: int) -> str:
     ((str(milliseconds) + " milliseconds, ") if milliseconds else "")
   return tmp[:-2]
 
-@Client.on_callback_query("audio")
-async def cb_audio():
-  try:
-    t = BackgroundTasks()
-    t.start()
-  except Exception as ee:
-    print(ee)
-
-@Client.on_callback_query("video")
-async def cb_video():
-  try:
-    tt = BackgroundTasks()
-    tt.start()
-  except Exception as ez:
-    print(ez)
-
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def select_format_msg(client, message):
   if not (await pyro_fsub(client, message, "@harp_tech") == True):
@@ -277,7 +261,22 @@ class BackgroundTasks(threading.Thread):
       shutil.rmtree(out_folder)
       await del_old_msg_send_msg(msg, client, message)
     
+@Client.on_callback_query("audio")
+async def cb_audio():
+  try:
+    t = BackgroundTasks()
+    t.start()
+  except Exception as ee:
+    print(ee)
 
+@Client.on_callback_query("video")
+async def cb_video():
+  try:
+    tt = BackgroundTasks()
+    tt.start()
+  except Exception as ez:
+    print(ez)
+    
 def get_lst_of_files(input_directory, output_lst):
   filesinfolder = os.listdir(input_directory)
   for file_name in filesinfolder:
