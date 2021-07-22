@@ -97,7 +97,12 @@ def time_formatter(milliseconds: int) -> str:
 async def select_format_msg(client, message):
   if not (await pyro_fsub(client, message, "@harp_tech") == True):
     return
-  await message.reply_text(
+  try:
+    t = BackgroundTasks()
+    t.start()
+  except Exception as ee:
+    print(ee)
+  '''await message.reply_text(
     "Select Your Desired Format",
     reply_markup=InlineKeyboardMarkup(
         [[
@@ -105,7 +110,7 @@ async def select_format_msg(client, message):
           InlineKeyboardButton("Video", callback_data="video")
         ]]
       ),
-    quote=True)
+    quote=True)'''
 
 class BackgroundTasks(threading.Thread):
   async def download_video(client, message):
