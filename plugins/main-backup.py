@@ -95,14 +95,10 @@ def time_formatter(milliseconds: int) -> str:
 
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
-async def kkkkk(client, message):
-  t1 = threading.Thread(target=runner, args=(client, message))
+async def download_video(client, message):
+  t1 = threading.Thread()
   t1.start()
   t1.join()
-
-def runner(client, message):
-  await download_video(client, message)
-async def download_video(client, message):
 
   fsub = "@harp_tech"
   if not (await pyro_fsub(client, message, fsub) == True):
