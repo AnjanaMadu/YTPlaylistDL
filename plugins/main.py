@@ -115,7 +115,7 @@ async def hmmm(client, message):
     quote=True)
 
 class BackgroundTasks(threading.Thread):
-  async def download_video(client, message=update.message):
+  async def download_video(client, message):
 
     url = message.text.split(None, 1)[0]
     type = message.text.split(None, 1)[1]
