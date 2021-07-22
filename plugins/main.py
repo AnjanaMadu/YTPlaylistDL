@@ -98,7 +98,7 @@ async def select_format_msg(client, message):
   if not (await pyro_fsub(client, message, "@harp_tech") == True):
     return
   try:
-    t = BackgroundTasks()
+    t = download_video()
     t.start()
   except Exception as ee:
     print(ee)
