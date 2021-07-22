@@ -111,14 +111,12 @@ async def download_video(client, message):
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
-  if not typee == "audio" or "video":
-    return await msg.edit("Oof.. Format Incorrect.")
 
   out_folder = f"downloads/{uuid.uuid4()}/"
   if not os.path.isdir(out_folder):
     os.makedirs(out_folder)
 
-  if typee == "audio":
+  if typee == "audio" or "music":
     opts = {
       'format':'bestaudio',
       'addmetadata':True,
