@@ -1,6 +1,6 @@
 __pycache__
 run.py
-main.backup.py
+#main.backup.py
 *.session
 *.session*
 x.py
