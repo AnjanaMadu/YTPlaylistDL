@@ -94,7 +94,7 @@ def time_formatter(milliseconds: int) -> str:
   return tmp[:-2]
 
 @Client.on_callback_query("audio")
-async def cb_audio(client, update):
+async def cb_audio():
   try:
     t = BackgroundTasks()
     t.start()
@@ -102,12 +102,12 @@ async def cb_audio(client, update):
     print(ee)
 
 @Client.on_callback_query("video")
-async def cb_video(client, update):
+async def cb_video():
   try:
     tt = BackgroundTasks()
     tt.start()
-  except Exception as ee:
-    print(ee)
+  except Exception as ez:
+    print(ez)
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def hmmm(client, message):
