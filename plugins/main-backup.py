@@ -105,11 +105,11 @@ async def download_video(client, message):
     return
 
   url = message.text.split(None, 1)[0]
-  type = message.text.split(None, 1)[1]
+  typee = message.text.split(None, 1)[1]
 
   if "playlist?list=" in url:
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
-    if not type == "audio" or "video":
+    if not typee == "audio" or "video":
       return await msg.edit("Oof.. Format Incorrect.")
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
@@ -118,7 +118,7 @@ async def download_video(client, message):
   if not os.path.isdir(out_folder):
     os.makedirs(out_folder)
 
-  if type == "audio":
+  if typee == "audio":
     opts = {
       'format':'bestaudio',
       'addmetadata':True,
@@ -142,7 +142,7 @@ async def download_video(client, message):
     video = False
     song = True
 
-  elif type == "video":
+  elif typee == "video":
     opts = {
       'format':'best',
       'addmetadata':True,
