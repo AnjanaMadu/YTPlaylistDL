@@ -4,12 +4,12 @@ import time
 import math
 import asyncio
 import logging
+import threading
 from youtube_dl import YoutubeDL
 from youtube_dl.utils import (DownloadError, ContentTooShortError,
                 ExtractorError, GeoRestrictedError,
                 MaxDownloadsReached, PostProcessingError,
                 UnavailableVideoError, XAttrMetadataError)
-from asyncio import sleep
 from PIL import Image
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
@@ -93,164 +93,180 @@ def time_formatter(milliseconds: int) -> str:
     ((str(milliseconds) + " milliseconds, ") if milliseconds else "")
   return tmp[:-2]
 
+@Client.on_callback_query()
+async def cb_handlr(client, update):
+  cb_dta = update.data
+  if "audio" or "video" in cb_dta:
+    t = BackgroundTasks()
+    t.start()
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
-async def download_video(client, message):
-
-  fsub = "@harp_tech"
-  if not (await pyro_fsub(client, message, fsub) == True):
+async def hmmm(client, message):
+  if not (await pyro_fsub(client, message, "@harp_tech") == True):
     return
+  await message.reply_text(
+    "Select Your Desired Format",
+    reply_markup=InlineKeyboardMarkup(
+        [[
+          InlineKeyboardButton("Audio", callback_data=f"audio")
+          InlineKeyboardButton("Video", callback_data=f"video"),
+        ]]
+      ),
+    quote=True)
 
-  url = message.text.split(None, 1)[0]
-  type = message.text.split(None, 1)[1]
+class BackgroundTasks(threading.Thread):
+  async def download_video(client, message=update.message):
 
-  if "playlist?list=" in url:
-    msg = await client.send_message(message.chat.id, '`Preparing to download...`', reply_to_message_id=message.message_id)
-  else:
-    return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
+    url = message.text.split(None, 1)[0]
+    type = message.text.split(None, 1)[1]
 
-  shutil.rmtree("/downloads/")
-  out_folder = f"/downloads/{uuid.uuid4()}/"
-  if not os.path.isdir(out_folder):
-    os.makedirs(out_folder)
+    if "playlist?list=" in url:
+      msg = await client.send_message(message.chat.id, '`Preparing to download...`', reply_to_message_id=message.message_id)
+    else:
+      return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
 
-  if type == "audio":
-    opts = {
-      'format':'bestaudio',
-      'addmetadata':True,
-      'noplaylist': False,
-      #'keepvideo': True,
-      'key':'FFmpegMetadata',
-      'writethumbnail':True,
-      'embedthumbnail':True,
-      'prefer_ffmpeg':True,
-      'geo_bypass':True,
-      'nocheckcertificate':True,
-      'postprocessors': [{
-        'key': 'FFmpegExtractAudio',
-        'preferredcodec': 'mp3',
-        'preferredquality': '320',
-      }],
-      'outtmpl':out_folder + '%(title)s.%(ext)s',
-      'quiet':False,
-      'logtostderr':False
-    }
-    video = False
-    song = True
+    shutil.rmtree("/downloads/")
+    out_folder = f"/downloads/{uuid.uuid4()}/"
+    if not os.path.isdir(out_folder):
+      os.makedirs(out_folder)
 
-  elif type == "video":
-    opts = {
-      'format':'best',
-      'addmetadata':True,
-      'noplaylist': False,
-      'getthumbnail':True,
-      'embedthumbnail': True,
-      'xattrs':True,
-      'writethumbnail': True,
-      #'keepvideo': True,
-      'key':'FFmpegMetadata',
-      'prefer_ffmpeg':True,
-      'geo_bypass':True,
-      'nocheckcertificate':True,
-      'postprocessors': [{
-        'key': 'FFmpegVideoConvertor',
-        'preferedformat': 'mp4'},],
-      'outtmpl':out_folder + '%(title)s.%(ext)s',
-      'logtostderr':False,
-      'quiet':False
-    }
-    song = False
-    video = True
+    if type == "audio":
+      opts = {
+        'format':'bestaudio',
+        'addmetadata':True,
+        'noplaylist': False,
+        #'keepvideo': True,
+        'key':'FFmpegMetadata',
+        'writethumbnail':True,
+        'embedthumbnail':True,
+        'prefer_ffmpeg':True,
+        'geo_bypass':True,
+        'nocheckcertificate':True,
+        'postprocessors': [{
+          'key': 'FFmpegExtractAudio',
+          'preferredcodec': 'mp3',
+          'preferredquality': '320',
+        }],
+        'outtmpl':out_folder + '%(title)s.%(ext)s',
+        'quiet':False,
+        'logtostderr':False
+      }
+      video = False
+      song = True
 
-  try:
-    await msg.edit("`Downloading Playlist...`")
-    with YoutubeDL(opts) as ytdl:
-      ytdl.cache.remove()
-      ytdl_data = ytdl.extract_info(url)
-    filename = sorted(get_lst_of_files(out_folder, []))
-  except DownloadError as DE:
-    return await msg.edit(f"`{str(DE)}`")
-  except ContentTooShortError:
-    return await msg.edit("`The download content was too short.`")
-  except GeoRestrictedError:
-    return await msg.edit(
-      "`Video is not available from your geographic location due to geographic restrictions imposed by a website.`"
-    )
-  except MaxDownloadsReached:
-    return await msg.edit("`Max-downloads limit has been reached.`")
-  except PostProcessingError:
-    return await msg.edit("`There was an error during post processing.`")
-  except UnavailableVideoError:
-    return await msg.edit("`Media is not available in the requested format.`")
-  except XAttrMetadataError as XAME:
-    return await msg.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
-  except ExtractorError:
-    return await msg.edit("`There was an error during info extraction.`")
-  except Exception as e:
-    return await msg.edit(f"{str(type(e)): {str(e)}}")
-  c_time = time.time()
-  try:
-    await msg.edit("`Downloaded.`")
-  except MessageNotModified:
-    pass
-  if song:
-    for single_file in filename:
-      if os.path.exists(single_file):
-        if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
-          thumb_image_path = get_thumb_name(single_file)
-          try:
-            ytdl_data_name_audio = os.path.basename(single_file)
-            tnow = time.time()
-            fduration, fwidth, fheight = get_metadata(single_file)
-            await message.reply_chat_action("upload_audio")
-            await client.send_audio(
-              message.chat.id,
-              single_file,
-              caption=f"**File:** `{ytdl_data_name_audio}`",
-              thumb=thumb_image_path,
-              duration=fduration,
-              progress=progress_for_pyrogram,
-              progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_audio)
-            )
-          except Exception as e:
-            await msg.edit("{} caused `{}`".format(single_file, str(e)))
-            continue
-          await message.reply_chat_action("cancel")
-          os.remove(single_file)
-    LOGGER.info(f"Clearing {out_folder}")
-    shutil.rmtree(out_folder)
-    await del_old_msg_send_msg(msg, client, message)
+    elif type == "video":
+      opts = {
+        'format':'best',
+        'addmetadata':True,
+        'noplaylist': False,
+        'getthumbnail':True,
+        'embedthumbnail': True,
+        'xattrs':True,
+        'writethumbnail': True,
+        #'keepvideo': True,
+        'key':'FFmpegMetadata',
+        'prefer_ffmpeg':True,
+        'geo_bypass':True,
+        'nocheckcertificate':True,
+        'postprocessors': [{
+          'key': 'FFmpegVideoConvertor',
+          'preferedformat': 'mp4'},],
+        'outtmpl':out_folder + '%(title)s.%(ext)s',
+        'logtostderr':False,
+        'quiet':False
+      }
+      song = False
+      video = True
 
-  if video:
-    for single_file in filename:
-      if os.path.exists(single_file):
-        if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
-          thumb_image_path = get_thumb_name(single_file)
-          try:
-            ytdl_data_name_video = os.path.basename(single_file)
-            tnow = time.time()
-            fduration, fwidth, fheight = get_metadata(single_file)
-            await message.reply_chat_action("upload_video")
-            await client.send_video(
-              message.chat.id,
-              single_file,
-              caption=f"**File:** `{ytdl_data_name_video}`",
-              thumb=thumb_image_path,
-              supports_streaming=True,
-              duration=fduration,
-              width=fwidth,
-              height=fheight,
-              progress=progress_for_pyrogram,
-              progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_video)
-            )
-          except Exception as e:
-            await msg.edit("{} caused `{}`".format(single_file, str(e)))
-            continue
-          await message.reply_chat_action("cancel")
-          os.remove(single_file)
-    LOGGER.info(f"Clearing {out_folder}")
-    shutil.rmtree(out_folder)
-    await del_old_msg_send_msg(msg, client, message)
+    try:
+      await msg.edit("`Downloading Playlist...`")
+      with YoutubeDL(opts) as ytdl:
+        ytdl.cache.remove()
+        ytdl_data = ytdl.extract_info(url)
+      filename = sorted(get_lst_of_files(out_folder, []))
+    except DownloadError as DE:
+      return await msg.edit(f"`{str(DE)}`")
+    except ContentTooShortError:
+      return await msg.edit("`The download content was too short.`")
+    except GeoRestrictedError:
+      return await msg.edit(
+        "`Video is not available from your geographic location due to geographic restrictions imposed by a website.`"
+      )
+    except MaxDownloadsReached:
+      return await msg.edit("`Max-downloads limit has been reached.`")
+    except PostProcessingError:
+      return await msg.edit("`There was an error during post processing.`")
+    except UnavailableVideoError:
+      return await msg.edit("`Media is not available in the requested format.`")
+    except XAttrMetadataError as XAME:
+      return await msg.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
+    except ExtractorError:
+      return await msg.edit("`There was an error during info extraction.`")
+    except Exception as e:
+      return await msg.edit(f"{str(type(e)): {str(e)}}")
+    c_time = time.time()
+    try:
+      await msg.edit("`Downloaded.`")
+    except MessageNotModified:
+      pass
+    if song:
+      for single_file in filename:
+        if os.path.exists(single_file):
+          if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
+            thumb_image_path = get_thumb_name(single_file)
+            try:
+              ytdl_data_name_audio = os.path.basename(single_file)
+              tnow = time.time()
+              fduration, fwidth, fheight = get_metadata(single_file)
+              await message.reply_chat_action("upload_audio")
+              await client.send_audio(
+                message.chat.id,
+                single_file,
+                caption=f"**File:** `{ytdl_data_name_audio}`",
+                thumb=thumb_image_path,
+                duration=fduration,
+                progress=progress_for_pyrogram,
+                progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_audio)
+              )
+            except Exception as e:
+              await msg.edit("{} caused `{}`".format(single_file, str(e)))
+              continue
+            await message.reply_chat_action("cancel")
+            os.remove(single_file)
+      LOGGER.info(f"Clearing {out_folder}")
+      shutil.rmtree(out_folder)
+      await del_old_msg_send_msg(msg, client, message)
+
+    if video:
+      for single_file in filename:
+        if os.path.exists(single_file):
+          if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
+            thumb_image_path = get_thumb_name(single_file)
+            try:
+              ytdl_data_name_video = os.path.basename(single_file)
+              tnow = time.time()
+              fduration, fwidth, fheight = get_metadata(single_file)
+              await message.reply_chat_action("upload_video")
+              await client.send_video(
+                message.chat.id,
+                single_file,
+                caption=f"**File:** `{ytdl_data_name_video}`",
+                thumb=thumb_image_path,
+                supports_streaming=True,
+                duration=fduration,
+                width=fwidth,
+                height=fheight,
+                progress=progress_for_pyrogram,
+                progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_video)
+              )
+            except Exception as e:
+              await msg.edit("{} caused `{}`".format(single_file, str(e)))
+              continue
+            await message.reply_chat_action("cancel")
+            os.remove(single_file)
+      LOGGER.info(f"Clearing {out_folder}")
+      shutil.rmtree(out_folder)
+      await del_old_msg_send_msg(msg, client, message)
     
 
 def get_lst_of_files(input_directory, output_lst):

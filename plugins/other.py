@@ -26,7 +26,6 @@ async def cb_handler(client, update):
 					InlineKeyboardButton("🔙 Back", callback_data=f"back")
 				]]
 			))
-	
 	if "about" in cb_data:
 		await update.message.edit_text("Language: Python\nFramework: Pyrogram\nEngine: YTDL\nCorded By: @Anjana_Ma\n\nPowered by @Harp_Tech",
 			reply_markup=InlineKeyboardMarkup(
@@ -35,7 +34,6 @@ async def cb_handler(client, update):
 					InlineKeyboardButton("🔙 Back", callback_data=f"back")
 				]]
 			))
-	
 	if "back" in cb_data:
 		await update.message.edit_text(f"Hi {update.from_user.mention},If you need any help, Just click help button.\n\nProject by @Harp_Tech",
 			reply_markup=InlineKeyboardMarkup(
