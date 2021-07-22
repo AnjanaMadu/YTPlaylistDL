@@ -108,8 +108,8 @@ async def hmmm(client, message):
     "Select Your Desired Format",
     reply_markup=InlineKeyboardMarkup(
         [[
-          InlineKeyboardButton("Audio", callback_data=f"audio")
-          InlineKeyboardButton("Video", callback_data=f"video"),
+          InlineKeyboardButton("Audio", callback_data=f"audio"),
+          InlineKeyboardButton("Video", callback_data=f"video")
         ]]
       ),
     quote=True)
