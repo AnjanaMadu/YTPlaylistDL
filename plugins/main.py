@@ -110,15 +110,15 @@ async def cb_video():
     print(ez)
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
-async def hmmm(client, message):
+async def select_format_msg(client, message):
   if not (await pyro_fsub(client, message, "@harp_tech") == True):
     return
   await message.reply_text(
     "Select Your Desired Format",
     reply_markup=InlineKeyboardMarkup(
         [[
-          InlineKeyboardButton("Audio", callback_data=f"audio"),
-          InlineKeyboardButton("Video", callback_data=f"video")
+          InlineKeyboardButton("Audio", callback_data="audio"),
+          InlineKeyboardButton("Video", callback_data="video")
         ]]
       ),
     quote=True)
