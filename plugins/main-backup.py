@@ -127,10 +127,10 @@ async def download_video(client, message):
       'embedthumbnail':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
-      'postprocessors': [{
-        'preferredcodec': 'mp3',
-        'preferredquality': '320',
-      }],
+      #'postprocessors': [{
+      #  'preferredcodec': 'mp3',
+      #  'preferredquality': '320',
+      #}],
       'outtmpl':out_folder + '%(title)s.%(ext)s',
       'quiet':False,
       'logtostderr':False
@@ -160,7 +160,7 @@ async def download_video(client, message):
     video = False
     song = True
 
-  if (os.environ.get("USE_HEROKU") == False) and (typee == "video"):
+  if (os.environ.get("USE_HEROKU") == "False") and (typee == "video"):
     opts = {
       'format':'best',
       'addmetadata':True,
@@ -182,7 +182,7 @@ async def download_video(client, message):
     }
     song = False
     video = True
-  elif (os.environ.get("USE_HEROKU") == True) and (typee == "video"):
+  elif (os.environ.get("USE_HEROKU") == "True") and (typee == "video"):
     opts = {
       'format':'best',
       'addmetadata':True,
@@ -193,8 +193,8 @@ async def download_video(client, message):
       'writethumbnail': True,
       'geo_bypass':True,
       'nocheckcertificate':True,
-      'postprocessors': [{
-        'preferedformat': 'mp4'},],
+      #'postprocessors': [{
+      #  'preferedformat': 'mp4'},],
       'outtmpl':out_folder + '%(title)s.%(ext)s',
       'logtostderr':False,
       'quiet':False
@@ -227,7 +227,7 @@ async def download_video(client, message):
   except ExtractorError:
     return await msg.edit("`There was an error during info extraction.`")
   except Exception as e:
-    return await msg.edit(f"{str(type(e)): {str(e)}}")
+    return await msg.edit(f"{str(e)}")
   c_time = time.time()
   try:
     await msg.edit("`Downloaded.`")
