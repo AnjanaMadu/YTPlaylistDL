@@ -127,10 +127,7 @@ async def download_video(client, message):
       'embedthumbnail':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
-      #'postprocessors': [{
-      #  'preferredcodec': 'mp3',
-      #  'preferredquality': '320',
-      #}],
+      'audioformat':'mp3',
       'outtmpl':out_folder + '%(title)s.%(ext)s',
       'quiet':False,
       'logtostderr':False
@@ -193,8 +190,7 @@ async def download_video(client, message):
       'writethumbnail': True,
       'geo_bypass':True,
       'nocheckcertificate':True,
-      #'postprocessors': [{
-      #  'preferedformat': 'mp4'},],
+      'videoformat':'mp4',
       'outtmpl':out_folder + '%(title)s.%(ext)s',
       'logtostderr':False,
       'quiet':False
