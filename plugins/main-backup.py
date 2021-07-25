@@ -106,6 +106,8 @@ async def download_video(client, message):
 
   url = message.text.split(None, 1)[0]
   typee = message.text.split(None, 1)[1]
+  if not ("audio") or ("video") in message.text:
+    return await client.send_message(message.chat.id, "`Ooof.. Give file format. (audio/video)`")
 
   if "playlist?list=" in url:
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
@@ -116,12 +118,30 @@ async def download_video(client, message):
   if not os.path.isdir(out_folder):
     os.makedirs(out_folder)
 
-  if typee == "audio" or "music":
+  if (os.environ.get("USE_HEROKU") == True) and (typee == "audio"):
     opts = {
       'format':'bestaudio',
       'addmetadata':True,
       'noplaylist': False,
-      #'keepvideo': True,
+      'writethumbnail':True,
+      'embedthumbnail':True,
+      'geo_bypass':True,
+      'nocheckcertificate':True,
+      'postprocessors': [{
+        'preferredcodec': 'mp3',
+        'preferredquality': '320',
+      }],
+      'outtmpl':out_folder + '%(title)s.%(ext)s',
+      'quiet':False,
+      'logtostderr':False
+    }
+    video = False
+    song = True
+  elif (os.environ.get("USE_HEROKU") == False) and (typee == "audio"):
+    opts = {
+      'format':'bestaudio',
+      'addmetadata':True,
+      'noplaylist': False,
       'key':'FFmpegMetadata',
       'writethumbnail':True,
       'embedthumbnail':True,
@@ -140,7 +160,7 @@ async def download_video(client, message):
     video = False
     song = True
 
-  elif typee == "video":
+  if (os.environ.get("USE_HEROKU") == False) and (typee == "video"):
     opts = {
       'format':'best',
       'addmetadata':True,
@@ -149,13 +169,31 @@ async def download_video(client, message):
       'embedthumbnail': True,
       'xattrs':True,
       'writethumbnail': True,
-      #'keepvideo': True,
       'key':'FFmpegMetadata',
       'prefer_ffmpeg':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
       'postprocessors': [{
         'key': 'FFmpegVideoConvertor',
+        'preferedformat': 'mp4'},],
+      'outtmpl':out_folder + '%(title)s.%(ext)s',
+      'logtostderr':False,
+      'quiet':False
+    }
+    song = False
+    video = True
+  elif (os.environ.get("USE_HEROKU") == True) and (typee == "video"):
+    opts = {
+      'format':'best',
+      'addmetadata':True,
+      'noplaylist': False,
+      'getthumbnail':True,
+      'embedthumbnail': True,
+      'xattrs':True,
+      'writethumbnail': True,
+      'geo_bypass':True,
+      'nocheckcertificate':True,
+      'postprocessors': [{
         'preferedformat': 'mp4'},],
       'outtmpl':out_folder + '%(title)s.%(ext)s',
       'logtostderr':False,
