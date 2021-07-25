@@ -118,7 +118,7 @@ async def download_video(client, message):
   if not os.path.isdir(out_folder):
     os.makedirs(out_folder)
 
-  if (os.environ.get("USE_HEROKU") == True) and (typee == "audio"):
+  if (os.environ.get("USE_HEROKU") == "True") and (typee == "audio"):
     opts = {
       'format':'bestaudio',
       'addmetadata':True,
@@ -137,7 +137,7 @@ async def download_video(client, message):
     }
     video = False
     song = True
-  elif (os.environ.get("USE_HEROKU") == False) and (typee == "audio"):
+  elif (os.environ.get("USE_HEROKU") == "False") and (typee == "audio"):
     opts = {
       'format':'bestaudio',
       'addmetadata':True,
