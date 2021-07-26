@@ -121,12 +121,14 @@ async def ytdl_dowload(client, msg, opts):
     return await msg.edit("`There was an error during info extraction.`")
   except Exception as e:
     return await msg.edit(f"{str(e)}")
+    return filename
 
 def ytdl_runner(client, msg, opts):
   try:
-    asyncio.create_task(ytdl_dowload(client, msg, opts))
+    filename = client.loop.create_task(ytdl_dowload(client, msg, opts))
   except Exception as e:
     print(e)
+    return filename
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
@@ -229,7 +231,7 @@ async def uloader(client, message):
     song = False
     video = True
 
-  threading.Thread(target=ytdl_runner, args=(client, msg, opts)).start()
+  filename = threading.Thread(target=ytdl_runner, args=(client, msg, opts)).start()
 
   c_time = time.time()
   try:
