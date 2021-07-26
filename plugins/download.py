@@ -230,8 +230,12 @@ async def uloader(client, message):
     }
     song = False
     video = True
-
-  filename = threading.Thread(target=ytdl_runner, args=(client, msg, opts)).start()
+  try:
+    filename = client.loop.create_task(ytdl_dowload(client, msg, opts))
+  except Exception as e:
+    print(e)
+  print(filename)
+  #filename = threading.Thread(target=ytdl_runner, args=(client, msg, opts)).start()
 
   c_time = time.time()
   try:
