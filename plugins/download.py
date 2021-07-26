@@ -101,9 +101,10 @@ def ytdl_dowload(url, opts):
       ytdl.cache.remove()
       ytdl_data = ytdl.extract_info(url)
     filename = sorted(get_lst_of_files(out_folder, []))
+    e = None
   except Exception as e:
     print(e)
-    return filename
+    return filename, e
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
@@ -128,13 +129,12 @@ async def uloader(client, message):
 
   if (os.environ.get("USE_HEROKU") == "True") and (typee == "audio"):
     opts = {
-      'format':'bestaudio[ext=mp3]',
+      'format':'134',
       'addmetadata':True,
       'noplaylist': False,
       'writethumbnail':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
-      'audioformat':'mp3',
       'outtmpl':out_folder + '%(title)s.%(ext)s',
       'quiet':False,
       'logtostderr':False
@@ -143,7 +143,7 @@ async def uloader(client, message):
     song = True
   elif (os.environ.get("USE_HEROKU") == "False") and (typee == "audio"):
     opts = {
-      'format':'bestaudio[ext=mp3]',
+      'format':'134',
       'addmetadata':True,
       'noplaylist': False,
       'key':'FFmpegMetadata',
@@ -165,7 +165,7 @@ async def uloader(client, message):
 
   if (os.environ.get("USE_HEROKU") == "False") and (typee == "video"):
     opts = {
-      'format':'best',
+      'format':'135',
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
@@ -185,7 +185,7 @@ async def uloader(client, message):
     video = True
   elif (os.environ.get("USE_HEROKU") == "True") and (typee == "video"):
     opts = {
-      'format':'best',
+      'format':'135',
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
@@ -203,10 +203,12 @@ async def uloader(client, message):
   try:
     await msg.edit("`Downloading Playlist...`")
     loop = get_running_loop()
-    filename = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
-  except Exception as e:
-    return await msg.edit(str(e))
-
+    filename, e = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
+    if not e == None:
+      return await msg.edit(str(e))
+  except:
+    pass
+    
   c_time = time.time()
   try:
     await msg.edit("`Downloaded.`")
