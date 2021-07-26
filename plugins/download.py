@@ -10,7 +10,8 @@ from youtube_dl.utils import (DownloadError, ContentTooShortError,
                 ExtractorError, GeoRestrictedError,
                 MaxDownloadsReached, PostProcessingError,
                 UnavailableVideoError, XAttrMetadataError)
-from PIL import Image
+from asyncio import get_running_loop
+from functools import partial
 from hachoir.metadata import extractMetadata
 from hachoir.parser import createParser
 import pyrogram
@@ -94,38 +95,12 @@ def time_formatter(milliseconds: int) -> str:
   return tmp[:-2]
 
 # --- YTDL DOWNLOADER --- #
-async def ytdl_dowload(client, msg, opts):
+def ytdl_dowload(url, opts):
   try:
-    await msg.edit("`Downloading Playlist...`")
     with YoutubeDL(opts) as ytdl:
       ytdl.cache.remove()
       ytdl_data = ytdl.extract_info(url)
     filename = sorted(get_lst_of_files(out_folder, []))
-  except DownloadError as DE:
-    return await msg.edit(f"`{str(DE)}`")
-  except ContentTooShortError:
-    return await msg.edit("`The download content was too short.`")
-  except GeoRestrictedError:
-    return await msg.edit(
-      "`Video is not available from your geographic location due to geographic restrictions imposed by a website.`"
-    )
-  except MaxDownloadsReached:
-    return await msg.edit("`Max-downloads limit has been reached.`")
-  except PostProcessingError:
-    return await msg.edit("`There was an error during post processing.`")
-  except UnavailableVideoError:
-    return await msg.edit("`Media is not available in the requested format.`")
-  except XAttrMetadataError as XAME:
-    return await msg.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
-  except ExtractorError:
-    return await msg.edit("`There was an error during info extraction.`")
-  except Exception as e:
-    return await msg.edit(f"{str(e)}")
-    return filename
-
-def ytdl_runner(client, msg, opts):
-  try:
-    filename = client.loop.create_task(ytdl_dowload(client, msg, opts))
   except Exception as e:
     print(e)
     return filename
@@ -157,7 +132,6 @@ async def uloader(client, message):
       'addmetadata':True,
       'noplaylist': False,
       'writethumbnail':True,
-      'embedthumbnail':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
       'audioformat':'mp3',
@@ -174,7 +148,6 @@ async def uloader(client, message):
       'noplaylist': False,
       'key':'FFmpegMetadata',
       'writethumbnail':True,
-      'embedthumbnail':True,
       'prefer_ffmpeg':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
@@ -195,8 +168,6 @@ async def uloader(client, message):
       'format':'best',
       'addmetadata':True,
       'noplaylist': False,
-      'getthumbnail':True,
-      'embedthumbnail': True,
       'xattrs':True,
       'writethumbnail': True,
       'key':'FFmpegMetadata',
@@ -217,8 +188,6 @@ async def uloader(client, message):
       'format':'best',
       'addmetadata':True,
       'noplaylist': False,
-      'getthumbnail':True,
-      'embedthumbnail': True,
       'xattrs':True,
       'writethumbnail': True,
       'geo_bypass':True,
@@ -230,12 +199,13 @@ async def uloader(client, message):
     }
     song = False
     video = True
+
   try:
-    filename = client.loop.create_task(ytdl_dowload(client, msg, opts))
+    await msg.edit("`Downloading Playlist...`")
+    loop = get_running_loop()
+    filename = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
   except Exception as e:
-    print(e)
-  print(filename)
-  #filename = threading.Thread(target=ytdl_runner, args=(client, msg, opts)).start()
+    return await msg.edit(str(e))
 
   c_time = time.time()
   try:
@@ -246,7 +216,6 @@ async def uloader(client, message):
     for single_file in filename:
       if os.path.exists(single_file):
         if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
-          thumb_image_path = get_thumb_name(single_file)
           try:
             ytdl_data_name_audio = os.path.basename(single_file)
             tnow = time.time()
@@ -256,7 +225,6 @@ async def uloader(client, message):
               message.chat.id,
               single_file,
               caption=f"**File:** `{ytdl_data_name_audio}`",
-              thumb=thumb_image_path,
               duration=fduration,
               progress=progress_for_pyrogram,
               progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_audio)
@@ -274,7 +242,6 @@ async def uloader(client, message):
     for single_file in filename:
       if os.path.exists(single_file):
         if single_file.endswith((".mp4", ".mp3", ".flac", ".webm")):
-          thumb_image_path = get_thumb_name(single_file)
           try:
             ytdl_data_name_video = os.path.basename(single_file)
             tnow = time.time()
@@ -284,7 +251,6 @@ async def uloader(client, message):
               message.chat.id,
               single_file,
               caption=f"**File:** `{ytdl_data_name_video}`",
-              thumb=thumb_image_path,
               supports_streaming=True,
               duration=fduration,
               width=fwidth,
@@ -361,18 +327,5 @@ async def pyro_fsub(c, message, fsub):
       parse_mode="markdown",
       disable_web_page_preview=True)
     return False
-
-def get_thumb_name(file):
-  thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
-  if not os.path.exists(thumb_image_path):
-    try:
-      if os.path.exists(f"{os.path.splitext(file)[0]}.webp"):
-        im = Image.open(f"{os.path.splitext(file)[0]}.webp").convert("RGB")
-        im.save(f"{os.path.splitext(file)[0]}.jpg", "jpeg")
-        thumb_image_path = f"{os.path.splitext(file)[0]}.jpg"
-    except:
-      thumb_image_path = None
-      pass
-      return thumb_image_path
 
 print("> Bot Started ")
