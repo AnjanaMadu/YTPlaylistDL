@@ -93,9 +93,43 @@ def time_formatter(milliseconds: int) -> str:
     ((str(milliseconds) + " milliseconds, ") if milliseconds else "")
   return tmp[:-2]
 
+# --- YTDL DOWNLOADER --- #
+async def ytdl_dowload(client, msg, opts):
+  try:
+    await msg.edit("`Downloading Playlist...`")
+    with YoutubeDL(opts) as ytdl:
+      ytdl.cache.remove()
+      ytdl_data = ytdl.extract_info(url)
+    filename = sorted(get_lst_of_files(out_folder, []))
+  except DownloadError as DE:
+    return await msg.edit(f"`{str(DE)}`")
+  except ContentTooShortError:
+    return await msg.edit("`The download content was too short.`")
+  except GeoRestrictedError:
+    return await msg.edit(
+      "`Video is not available from your geographic location due to geographic restrictions imposed by a website.`"
+    )
+  except MaxDownloadsReached:
+    return await msg.edit("`Max-downloads limit has been reached.`")
+  except PostProcessingError:
+    return await msg.edit("`There was an error during post processing.`")
+  except UnavailableVideoError:
+    return await msg.edit("`Media is not available in the requested format.`")
+  except XAttrMetadataError as XAME:
+    return await msg.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
+  except ExtractorError:
+    return await msg.edit("`There was an error during info extraction.`")
+  except Exception as e:
+    return await msg.edit(f"{str(e)}")
+
+def ytdl_runner(client, msg, opts):
+  try:
+    asyncio.create_task(ytdl_dowload(client, msg, opts))
+  except Exception as e:
+    await msg.edit(str(e))
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
-async def download_video(client, message):
+async def uloader(client, message):
   t1 = threading.Thread()
   t1.start()
   t1.join()
@@ -198,32 +232,8 @@ async def download_video(client, message):
     song = False
     video = True
 
-  try:
-    await msg.edit("`Downloading Playlist...`")
-    with YoutubeDL(opts) as ytdl:
-      ytdl.cache.remove()
-      ytdl_data = ytdl.extract_info(url)
-    filename = sorted(get_lst_of_files(out_folder, []))
-  except DownloadError as DE:
-    return await msg.edit(f"`{str(DE)}`")
-  except ContentTooShortError:
-    return await msg.edit("`The download content was too short.`")
-  except GeoRestrictedError:
-    return await msg.edit(
-      "`Video is not available from your geographic location due to geographic restrictions imposed by a website.`"
-    )
-  except MaxDownloadsReached:
-    return await msg.edit("`Max-downloads limit has been reached.`")
-  except PostProcessingError:
-    return await msg.edit("`There was an error during post processing.`")
-  except UnavailableVideoError:
-    return await msg.edit("`Media is not available in the requested format.`")
-  except XAttrMetadataError as XAME:
-    return await msg.edit(f"`{XAME.code}: {XAME.msg}\n{XAME.reason}`")
-  except ExtractorError:
-    return await msg.edit("`There was an error during info extraction.`")
-  except Exception as e:
-    return await msg.edit(f"{str(e)}")
+  threading.Thread(target=ytdl_runner, args=(client, msg, opts)).start()
+
   c_time = time.time()
   try:
     await msg.edit("`Downloaded.`")
