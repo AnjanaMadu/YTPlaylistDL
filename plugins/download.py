@@ -126,13 +126,10 @@ def ytdl_runner(client, msg, opts):
   try:
     asyncio.create_task(ytdl_dowload(client, msg, opts))
   except Exception as e:
-    await msg.edit(str(e))
+    print(e)
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
-  t1 = threading.Thread()
-  t1.start()
-  t1.join()
 
   fsub = "@harp_tech"
   if not (await pyro_fsub(client, message, fsub) == True):
