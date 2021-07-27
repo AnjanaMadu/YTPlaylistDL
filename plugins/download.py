@@ -29,7 +29,7 @@ logging.basicConfig(
 LOGGER = logging.getLogger(__name__)
 
 # --- PROGRESS DEF --- #
-async def progress_for_pyrogram(
+'''async def progress_for_pyrogram(
   current,
   total,
   ud_type,
@@ -67,7 +67,7 @@ async def progress_for_pyrogram(
         )
       )
     except MessageNotModified:
-      pass
+      pass'''
 
 # --- HUMANBYTES DEF --- #
 def humanbytes(size):
@@ -204,11 +204,11 @@ async def uloader(client, message):
     loop = get_running_loop()
     filename, e = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts, out_folder))
   except Exception as e:
-    return await msg.edit("Something went wrong. :(")
+    return await msg.edit(e)
     
   c_time = time.time()
   try:
-    await msg.edit("`Downloaded.`")
+    await msg.edit("`Uploading.`")
   except MessageNotModified:
     pass
   if song:
@@ -224,10 +224,7 @@ async def uloader(client, message):
               message.chat.id,
               single_file,
               caption=f"**File:** `{ytdl_data_name_audio}`",
-              duration=fduration,
-              progress=progress_for_pyrogram,
-              progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_audio)
-            )
+              duration=fduration)
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
@@ -253,10 +250,7 @@ async def uloader(client, message):
               supports_streaming=True,
               duration=fduration,
               width=fwidth,
-              height=fheight,
-              progress=progress_for_pyrogram,
-              progress_args=("🎗 **__Uploading...__**", msg, tnow, ytdl_data_name_video)
-            )
+              height=fheight)
           except Exception as e:
             await msg.edit("{} caused `{}`".format(single_file, str(e)))
             continue
