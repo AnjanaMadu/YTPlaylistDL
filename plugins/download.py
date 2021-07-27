@@ -101,10 +101,9 @@ def ytdl_dowload(url, opts):
       ytdl.cache.remove()
       ytdl_data = ytdl.extract_info(url)
     filename = sorted(get_lst_of_files(out_folder, []))
-    e = None
   except Exception as e:
     print(e)
-    return filename, e
+    return filename
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
@@ -204,10 +203,8 @@ async def uloader(client, message):
     await msg.edit("`Downloading Playlist...`")
     loop = get_running_loop()
     filename, e = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
-    if not e == None:
-      return await msg.edit(str(e))
-  except:
-    pass
+  except Exception as e:
+    return await msg.edit("Something went wrong. :(")
     
   c_time = time.time()
   try:
