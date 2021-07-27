@@ -126,7 +126,7 @@ async def uloader(client, message):
 
   if (os.environ.get("USE_HEROKU") == "True") and (typee == "audio"):
     opts = {
-      'format':'140',
+      'format':'bestaudio',
       'addmetadata':True,
       'noplaylist': False,
       'writethumbnail':True,
@@ -140,7 +140,7 @@ async def uloader(client, message):
     song = True
   elif (os.environ.get("USE_HEROKU") == "False") and (typee == "audio"):
     opts = {
-      'format':'140',
+      'format':'bestaudio',
       'addmetadata':True,
       'noplaylist': False,
       'key':'FFmpegMetadata',
