@@ -6,10 +6,6 @@ import asyncio
 import logging
 import threading
 from youtube_dl import YoutubeDL
-from youtube_dl.utils import (DownloadError, ContentTooShortError,
-                ExtractorError, GeoRestrictedError,
-                MaxDownloadsReached, PostProcessingError,
-                UnavailableVideoError, XAttrMetadataError)
 from asyncio import get_running_loop
 from functools import partial
 from hachoir.metadata import extractMetadata
@@ -149,7 +145,6 @@ async def uloader(client, message):
       'format':'bestaudio',
       'addmetadata':True,
       'noplaylist': False,
-      'writethumbnail':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
       'outtmpl':out_folder + '%(title)s.%(ext)s',
@@ -164,7 +159,6 @@ async def uloader(client, message):
       'addmetadata':True,
       'noplaylist': False,
       'key':'FFmpegMetadata',
-      'writethumbnail':True,
       'prefer_ffmpeg':True,
       'geo_bypass':True,
       'nocheckcertificate':True,
@@ -186,7 +180,6 @@ async def uloader(client, message):
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
-      'writethumbnail': True,
       'key':'FFmpegMetadata',
       'prefer_ffmpeg':True,
       'geo_bypass':True,
@@ -206,7 +199,6 @@ async def uloader(client, message):
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
-      'writethumbnail': True,
       'geo_bypass':True,
       'nocheckcertificate':True,
       'videoformat':'mp4',
