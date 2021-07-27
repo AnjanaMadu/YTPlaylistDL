@@ -14,6 +14,14 @@
       "description": "Get this value from my.telegram.org! Please do not steal.",
       "value": ""
     },
+    "LOG_CHNL": {
+      "description": "A channel or group ID to log user activities.",
+      "value": ""
+    },
+    "UPDTE_CHNL": {
+      "description": "Channel username to work force sub! Bot should admin in ur chnl",
+      "value": ""
+    },
     "USE_HEROKU": {
       "description": "Do not change this. Else bot will crash!",
       "value": "True"

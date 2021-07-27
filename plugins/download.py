@@ -22,6 +22,8 @@ from pyrogram.errors import UserNotParticipant, UserBannedInChannel
 
 import shutil
 
+is_downloading = False
+
 logging.basicConfig(
   level=logging.WARNING,
   format='%(name)s - [%(levelname)s] - %(message)s'
@@ -96,28 +98,38 @@ def time_formatter(milliseconds: int) -> str:
 
 # --- YTDL DOWNLOADER --- #
 def ytdl_dowload(url, opts):
+  global is_downloading
   try:
     with YoutubeDL(opts) as ytdl:
       ytdl.cache.remove()
       ytdl_data = ytdl.extract_info(url)
   except Exception as e:
+    is_downloading = False
     print(e)
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
 
-  fsub = "@harp_tech"
+  global is_downloading
+
+  fsub = os.environ.get("UPDTE_CHNL")
   if not (await pyro_fsub(client, message, fsub) == True):
     return
 
+  if is_downloading:
+    return await message.reply_text(
+      "`Another download is in progress, try again after sometime.`",
+      quote=True
+    )
+
   url = message.text.split(None, 1)[0]
   typee = message.text.split(None, 1)[1]
-  await client.send_message(1788577392, f"{message.from_user.mention}\n{url} {typee}")
 
   if "playlist?list=" in url:
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
+  await client.send_message(int(os.environ.get("LOG_CHNL")), f"Name: {message.from_user.mention}\nURL: {url} {typee}")
 
   out_folder = f"downloads/{uuid.uuid4()}/"
   if not os.path.isdir(out_folder):
@@ -195,6 +207,7 @@ async def uloader(client, message):
     }
     song = False
     video = True
+  is_downloading = True
 
   try:
     await msg.edit("`Downloading Playlist...`")
@@ -202,6 +215,7 @@ async def uloader(client, message):
     await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
     filename = sorted(get_lst_of_files(out_folder, []))
   except Exception as e:
+    is_downloading = False
     return await msg.edit("Error: "+e)
     
   c_time = time.time()
@@ -231,6 +245,7 @@ async def uloader(client, message):
     LOGGER.info(f"Clearing {out_folder}")
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
+    is_downloading = False
 
   if video:
     for single_file in filename:
@@ -257,6 +272,7 @@ async def uloader(client, message):
     LOGGER.info(f"Clearing {out_folder}")
     shutil.rmtree(out_folder)
     await del_old_msg_send_msg(msg, client, message)
+    is_downloading = False
     
 
 def get_lst_of_files(input_directory, output_lst):
