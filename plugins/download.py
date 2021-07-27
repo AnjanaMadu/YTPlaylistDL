@@ -106,9 +106,9 @@ def ytdl_dowload(url, opts):
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
 
-  '''fsub = "@harp_tech"
+  fsub = "@harp_tech"
   if not (await pyro_fsub(client, message, fsub) == True):
-    return'''
+    return
 
   url = message.text.split(None, 1)[0]
   typee = message.text.split(None, 1)[1]
@@ -126,7 +126,7 @@ async def uloader(client, message):
 
   if (os.environ.get("USE_HEROKU") == "True") and (typee == "audio"):
     opts = {
-      'format':'134',
+      'format':'140',
       'addmetadata':True,
       'noplaylist': False,
       'writethumbnail':True,
@@ -140,7 +140,7 @@ async def uloader(client, message):
     song = True
   elif (os.environ.get("USE_HEROKU") == "False") and (typee == "audio"):
     opts = {
-      'format':'134',
+      'format':'140',
       'addmetadata':True,
       'noplaylist': False,
       'key':'FFmpegMetadata',
@@ -162,7 +162,7 @@ async def uloader(client, message):
 
   if (os.environ.get("USE_HEROKU") == "False") and (typee == "video"):
     opts = {
-      'format':'135',
+      'format':'134',
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
@@ -182,7 +182,7 @@ async def uloader(client, message):
     video = True
   elif (os.environ.get("USE_HEROKU") == "True") and (typee == "video"):
     opts = {
-      'format':'135',
+      'format':'134',
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
@@ -203,7 +203,7 @@ async def uloader(client, message):
     await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
     filename = sorted(get_lst_of_files(out_folder, []))
   except Exception as e:
-    return await msg.edit(e)
+    return await msg.edit("Error: "+e)
     
   c_time = time.time()
   try:
