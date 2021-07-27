@@ -108,9 +108,9 @@ def ytdl_dowload(url, opts):
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
 
-  fsub = "@harp_tech"
-  if not (await pyro_fsub(client, message, fsub) == True):
-    return
+  #fsub = "@harp_tech"
+  #if not (await pyro_fsub(client, message, fsub) == True):
+  #  return
 
   url = message.text.split(None, 1)[0]
   typee = message.text.split(None, 1)[1]
