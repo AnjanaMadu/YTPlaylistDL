@@ -162,7 +162,7 @@ async def uloader(client, message):
 
   if (os.environ.get("USE_HEROKU") == "False") and (typee == "video"):
     opts = {
-      'format':'134',
+      'format':'best',
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
@@ -182,7 +182,7 @@ async def uloader(client, message):
     video = True
   elif (os.environ.get("USE_HEROKU") == "True") and (typee == "video"):
     opts = {
-      'format':'134',
+      'format':'best',
       'addmetadata':True,
       'noplaylist': False,
       'xattrs':True,
