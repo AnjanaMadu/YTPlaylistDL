@@ -95,7 +95,7 @@ def time_formatter(milliseconds: int) -> str:
   return tmp[:-2]
 
 # --- YTDL DOWNLOADER --- #
-def ytdl_dowload(url, opts):
+def ytdl_dowload(url, opts, out_folder):
   try:
     with YoutubeDL(opts) as ytdl:
       ytdl.cache.remove()
@@ -108,9 +108,9 @@ def ytdl_dowload(url, opts):
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
 
-  #fsub = "@harp_tech"
-  #if not (await pyro_fsub(client, message, fsub) == True):
-  #  return
+  fsub = "@harp_tech"
+  if not (await pyro_fsub(client, message, fsub) == True):
+    return
 
   url = message.text.split(None, 1)[0]
   typee = message.text.split(None, 1)[1]
@@ -202,7 +202,7 @@ async def uloader(client, message):
   try:
     await msg.edit("`Downloading Playlist...`")
     loop = get_running_loop()
-    filename, e = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
+    filename, e = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts, out_folder))
   except Exception as e:
     return await msg.edit("Something went wrong. :(")
     
