@@ -95,15 +95,13 @@ def time_formatter(milliseconds: int) -> str:
   return tmp[:-2]
 
 # --- YTDL DOWNLOADER --- #
-def ytdl_dowload(url, opts, out_folder):
+def ytdl_dowload(url, opts):
   try:
     with YoutubeDL(opts) as ytdl:
       ytdl.cache.remove()
       ytdl_data = ytdl.extract_info(url)
-    filename = sorted(get_lst_of_files(out_folder, []))
   except Exception as e:
     print(e)
-    return filename
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
@@ -202,7 +200,8 @@ async def uloader(client, message):
   try:
     await msg.edit("`Downloading Playlist...`")
     loop = get_running_loop()
-    filename, e = await loop.run_in_executor(None, partial(ytdl_dowload, url, opts, out_folder))
+    await loop.run_in_executor(None, partial(ytdl_dowload, url, opts))
+    filename = sorted(get_lst_of_files(out_folder, []))
   except Exception as e:
     return await msg.edit(e)
     
