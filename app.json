@@ -3,7 +3,7 @@
   "description": "A Telegram bot to download youtube playlists and upload them to telegram.",
   "env": {
     "TOKEN": {
-      "description": "Enter bot toke.",
+      "description": "Enter bot token.",
       "value": ""
     },
     "APP_ID": {
@@ -16,8 +16,7 @@
     },
     "USE_HEROKU": {
       "description": "Do not change this. Else bot will crash!",
-      "value": "True",
-      "required": false
+      "value": "True"
     }
   },
   "buildpacks": [{
