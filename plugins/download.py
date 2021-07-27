@@ -111,10 +111,14 @@ def ytdl_dowload(url, opts):
 async def uloader(client, message):
 
   global is_downloading
-
-  fsub = os.environ.get("UPDTE_CHNL")
-  if not (await pyro_fsub(client, message, fsub) == True):
-    return
+  
+  try:
+    fsub = os.environ.get("UPDTE_CHNL")
+  except:
+    pass
+  if fsub:
+    if not (await pyro_fsub(client, message, fsub) == True):
+      return
 
   if is_downloading:
     return await message.reply_text(
@@ -129,7 +133,12 @@ async def uloader(client, message):
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
-  await client.send_message(int(os.environ.get("LOG_CHNL")), f"Name: {message.from_user.mention}\nURL: {url} {typee}")
+  try:
+    logchnl = int(os.environ.get("LOG_CHNL"))
+  except:
+    pass
+  if logchnl:
+    await client.send_message(logchnl, f"Name: {message.from_user.mention}\nURL: {url} {typee}")
 
   out_folder = f"downloads/{uuid.uuid4()}/"
   if not os.path.isdir(out_folder):
