@@ -17,12 +17,12 @@
     "LOG_CHNL": {
       "description": "A channel or group ID to log user activities.",
       "value": "",
-      "required": False
+      "required": false
     },
     "UPDTE_CHNL": {
       "description": "Channel username to work force sub! Bot should admin in ur chnl",
       "value": "",
-      "required": False
+      "required": false
     },
     "USE_HEROKU": {
       "description": "Do not change this. Else bot will crash!",
