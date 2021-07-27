@@ -129,12 +129,6 @@ async def uloader(client, message):
     msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
   else:
     return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
-  try:
-    logchnl = int(os.environ.get("LOG_CHNL"))
-  except:
-    pass
-  if logchnl:
-    await client.send_message(logchnl, f"Name: {message.from_user.mention}\nURL: {url} {typee}")
 
   out_folder = f"downloads/{uuid.uuid4()}/"
   if not os.path.isdir(out_folder):
@@ -209,7 +203,12 @@ async def uloader(client, message):
     song = False
     video = True
   is_downloading = True
-
+  try:
+    logchnl = int(os.environ.get("LOG_CHNL"))
+  except:
+    pass
+  if logchnl:
+    await client.send_message(logchnl, f"Name: {message.from_user.mention}\nURL: {url} {typee}")
   try:
     await msg.edit("`Downloading Playlist...`")
     loop = get_running_loop()
