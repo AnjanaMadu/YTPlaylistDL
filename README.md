@@ -17,7 +17,8 @@ Click below button to deploy.
 - [Me](https://github.com/AnjanaMadu) for this Project 🤪
 
 ## 📌 License
-````YTPlaylistDL, An Telegram Bot Project
+```
+YTPlaylistDL, An Telegram Bot Project
 Copyright (c) 2021 Anjana Madu <https://github.com/AnjanaMadu>
 
 This program is free software: you can redistribute it and/or modify
@@ -31,4 +32,5 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>```
+along with this program.  If not, see <https://www.gnu.org/licenses/>
+```
