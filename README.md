@@ -14,6 +14,7 @@ Click below button to deploy.
 
 ## 📌 Credits
 - [Youtube-DL](https://youtube-dl.org) for Youtube-DL python
+- [WBB](https://github.com/thehamkercat/WilliamButcherBot) for is_downloading idea
 - [Me](https://github.com/AnjanaMadu) for this Project 🤪
 
 ## 📌 License
