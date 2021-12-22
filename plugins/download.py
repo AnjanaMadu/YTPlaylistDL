@@ -52,7 +52,7 @@ LOGGER = logging.getLogger(__name__)
 ):
     now = time.time()
     diff = now - start
-    if round(diff % 10.00) == 0 or current == total:
+    if round(diff % 10) == 0 or current == total:
         percentage = current * 100 / total
         speed = current / diff
         elapsed_time = round(diff) * 1000
@@ -327,6 +327,7 @@ async def pyro_fsub(c, message, fsub):
                 parse_mode="markdown",
                 disable_web_page_preview=True
             )
+            return False
         return True
     except UserNotParticipant:
         await c.send_message(
