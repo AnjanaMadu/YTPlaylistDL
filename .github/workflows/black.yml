@@ -24,3 +24,6 @@ jobs:
       
       - name: Create Pull Request
         uses: peter-evans/create-pull-request@v3.14.0
+        with:
+          commit-message: "Code reformat"
+          body: "Code reformatted by workflow"
