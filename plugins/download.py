@@ -1,4 +1,4 @@
-'''YTPlaylistDL, An Telegram Bot Project
+"""YTPlaylistDL, An Telegram Bot Project
 Copyright (c) 2021 Anjana Madu <https://github.com/AnjanaMadu>
 
 This program is free software: you can redistribute it and/or modify
@@ -12,7 +12,7 @@ MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 GNU Affero General Public License for more details.
 
 You should have received a copy of the GNU Affero General Public License
-along with this program.  If not, see <https://www.gnu.org/licenses/>'''
+along with this program.  If not, see <https://www.gnu.org/licenses/>"""
 import os
 import uuid
 import time
@@ -36,13 +36,12 @@ import shutil
 is_downloading = False
 
 logging.basicConfig(
-    level=logging.WARNING,
-    format='%(name)s - [%(levelname)s] - %(message)s'
+    level=logging.WARNING, format="%(name)s - [%(levelname)s] - %(message)s"
 )
 LOGGER = logging.getLogger(__name__)
 
 # --- PROGRESS DEF --- #
-'''async def progress_for_pyrogram(
+"""async def progress_for_pyrogram(
     current,
     total,
     ud_type,
@@ -80,7 +79,7 @@ LOGGER = logging.getLogger(__name__)
                 )
             )
         except MessageNotModified:
-            pass'''
+            pass"""
 
 # --- HUMANBYTES DEF --- #
 def humanbytes(size):
@@ -88,11 +87,12 @@ def humanbytes(size):
         return ""
     power = 2**10
     n = 0
-    Dic_powerN = {0: ' ', 1: 'Ki', 2: 'Mi', 3: 'Gi', 4: 'Ti'}
+    Dic_powerN = {0: " ", 1: "Ki", 2: "Mi", 3: "Gi", 4: "Ti"}
     while size > power:
         size /= power
         n += 1
-    return str(round(size, 2)) + " " + Dic_powerN[n] + 'B'
+    return str(round(size, 2)) + " " + Dic_powerN[n] + "B"
+
 
 # --- TIME FORMATTER DEF --- #
 def time_formatter(milliseconds: int) -> str:
@@ -100,12 +100,15 @@ def time_formatter(milliseconds: int) -> str:
     minutes, seconds = divmod(seconds, 60)
     hours, minutes = divmod(minutes, 60)
     days, hours = divmod(hours, 24)
-    tmp = ((str(days) + "days, ") if days else "") + \
-        ((str(hours) + " hours, ") if hours else "") + \
-        ((str(minutes) + " minites, ") if minutes else "") + \
-        ((str(seconds) + " seconds, ") if seconds else "") + \
-        ((str(milliseconds) + " milliseconds, ") if milliseconds else "")
+    tmp = (
+        ((str(days) + "days, ") if days else "")
+        + ((str(hours) + " hours, ") if hours else "")
+        + ((str(minutes) + " minites, ") if minutes else "")
+        + ((str(seconds) + " seconds, ") if seconds else "")
+        + ((str(milliseconds) + " milliseconds, ") if milliseconds else "")
+    )
     return tmp[:-2]
+
 
 # --- YTDL DOWNLOADER --- #
 def ytdl_dowload(url, opts):
@@ -117,6 +120,7 @@ def ytdl_dowload(url, opts):
     except Exception as e:
         is_downloading = False
         print(e)
+
 
 @Client.on_message(filters.regex(pattern=".*http.* (.*)"))
 async def uloader(client, message):
@@ -133,17 +137,22 @@ async def uloader(client, message):
 
     if is_downloading:
         return await message.reply_text(
-            "`Another download is in progress, try again after sometime.`",
-            quote=True
+            "`Another download is in progress, try again after sometime.`", quote=True
         )
 
     url = message.text.split(None, 1)[0]
     typee = message.text.split(None, 1)[1]
 
     if "playlist?list=" in url:
-        msg = await client.send_message(message.chat.id, '`Processing...`', reply_to_message_id=message.message_id)
+        msg = await client.send_message(
+            message.chat.id, "`Processing...`", reply_to_message_id=message.message_id
+        )
     else:
-        return await client.send_message(message.chat.id, '`I think this is invalid link...`', reply_to_message_id=message.message_id)
+        return await client.send_message(
+            message.chat.id,
+            "`I think this is invalid link...`",
+            reply_to_message_id=message.message_id,
+        )
 
     out_folder = f"downloads/{uuid.uuid4()}/"
     if not os.path.isdir(out_folder):
@@ -151,69 +160,71 @@ async def uloader(client, message):
 
     if (os.environ.get("USE_HEROKU") == "True") and (typee == "audio"):
         opts = {
-            'format':'bestaudio',
-            'addmetadata':True,
-            'noplaylist': False,
-            'geo_bypass':True,
-            'nocheckcertificate':True,
-            'outtmpl':out_folder + '%(title)s.%(ext)s',
-            'quiet':False,
-            'logtostderr':False
+            "format": "bestaudio",
+            "addmetadata": True,
+            "noplaylist": False,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "outtmpl": out_folder + "%(title)s.%(ext)s",
+            "quiet": False,
+            "logtostderr": False,
         }
         video = False
         song = True
     elif (os.environ.get("USE_HEROKU") == "False") and (typee == "audio"):
         opts = {
-            'format':'bestaudio',
-            'addmetadata':True,
-            'noplaylist': False,
-            'key':'FFmpegMetadata',
-            'prefer_ffmpeg':True,
-            'geo_bypass':True,
-            'nocheckcertificate':True,
-            'postprocessors': [{
-                'key': 'FFmpegExtractAudio',
-                'preferredcodec': 'mp3',
-                'preferredquality': '320',
-            }],
-            'outtmpl':out_folder + '%(title)s.%(ext)s',
-            'quiet':False,
-            'logtostderr':False
+            "format": "bestaudio",
+            "addmetadata": True,
+            "noplaylist": False,
+            "key": "FFmpegMetadata",
+            "prefer_ffmpeg": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "postprocessors": [
+                {
+                    "key": "FFmpegExtractAudio",
+                    "preferredcodec": "mp3",
+                    "preferredquality": "320",
+                }
+            ],
+            "outtmpl": out_folder + "%(title)s.%(ext)s",
+            "quiet": False,
+            "logtostderr": False,
         }
         video = False
         song = True
 
     if (os.environ.get("USE_HEROKU") == "False") and (typee == "video"):
         opts = {
-            'format':'best',
-            'addmetadata':True,
-            'noplaylist': False,
-            'xattrs':True,
-            'key':'FFmpegMetadata',
-            'prefer_ffmpeg':True,
-            'geo_bypass':True,
-            'nocheckcertificate':True,
-            'postprocessors': [{
-                'key': 'FFmpegVideoConvertor',
-                'preferedformat': 'mp4'},],
-            'outtmpl':out_folder + '%(title)s.%(ext)s',
-            'logtostderr':False,
-            'quiet':False
+            "format": "best",
+            "addmetadata": True,
+            "noplaylist": False,
+            "xattrs": True,
+            "key": "FFmpegMetadata",
+            "prefer_ffmpeg": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "postprocessors": [
+                {"key": "FFmpegVideoConvertor", "preferedformat": "mp4"},
+            ],
+            "outtmpl": out_folder + "%(title)s.%(ext)s",
+            "logtostderr": False,
+            "quiet": False,
         }
         song = False
         video = True
     elif (os.environ.get("USE_HEROKU") == "True") and (typee == "video"):
         opts = {
-            'format':'best',
-            'addmetadata':True,
-            'noplaylist': False,
-            'xattrs':True,
-            'geo_bypass':True,
-            'nocheckcertificate':True,
-            'videoformat':'mp4',
-            'outtmpl':out_folder + '%(title)s.%(ext)s',
-            'logtostderr':False,
-            'quiet':False
+            "format": "best",
+            "addmetadata": True,
+            "noplaylist": False,
+            "xattrs": True,
+            "geo_bypass": True,
+            "nocheckcertificate": True,
+            "videoformat": "mp4",
+            "outtmpl": out_folder + "%(title)s.%(ext)s",
+            "logtostderr": False,
+            "quiet": False,
         }
         song = False
         video = True
@@ -223,7 +234,9 @@ async def uloader(client, message):
     except:
         pass
     if logchnl:
-        await client.send_message(logchnl, f"Name: {message.from_user.mention}\nURL: {url} {typee}")
+        await client.send_message(
+            logchnl, f"Name: {message.from_user.mention}\nURL: {url} {typee}"
+        )
     try:
         await msg.edit("`Downloading Playlist...`")
         loop = get_running_loop()
@@ -231,7 +244,7 @@ async def uloader(client, message):
         filename = sorted(get_lst_of_files(out_folder, []))
     except Exception as e:
         is_downloading = False
-        return await msg.edit("Error: "+e)
+        return await msg.edit("Error: " + e)
 
     c_time = time.time()
     try:
@@ -251,7 +264,8 @@ async def uloader(client, message):
                             message.chat.id,
                             single_file,
                             caption=f"**File:** `{ytdl_data_name_audio}`",
-                            duration=fduration)
+                            duration=fduration,
+                        )
                     except Exception as e:
                         await msg.edit("{} caused `{}`".format(single_file, str(e)))
                         continue
@@ -278,7 +292,8 @@ async def uloader(client, message):
                             supports_streaming=True,
                             duration=fduration,
                             width=fwidth,
-                            height=fheight)
+                            height=fheight,
+                        )
                     except Exception as e:
                         await msg.edit("{} caused `{}`".format(single_file, str(e)))
                         continue
@@ -299,9 +314,11 @@ def get_lst_of_files(input_directory, output_lst):
         output_lst.append(current_file_name)
     return output_lst
 
+
 async def del_old_msg_send_msg(msg, client, message):
     await msg.delete()
     await client.send_message(message.chat.id, "`Playlist Upload Success!`")
+
 
 def get_metadata(file):
     fwidth = None
@@ -310,12 +327,13 @@ def get_metadata(file):
     metadata = extractMetadata(createParser(file))
     if metadata is not None:
         if metadata.has("duration"):
-            fduration = metadata.get('duration').seconds
+            fduration = metadata.get("duration").seconds
         if metadata.has("width"):
             fwidth = metadata.get("width")
         if metadata.has("height"):
             fheight = metadata.get("height")
     return fduration, fwidth, fheight
+
 
 async def pyro_fsub(c, message, fsub):
     try:
@@ -325,7 +343,7 @@ async def pyro_fsub(c, message, fsub):
                 chat_id=message.chat.id,
                 text="Sorry, You are Banned to use me. Contact my [Support Group](https://t.me/harp_chat).",
                 parse_mode="markdown",
-                disable_web_page_preview=True
+                disable_web_page_preview=True,
             )
         return True
     except UserNotParticipant:
@@ -333,12 +351,8 @@ async def pyro_fsub(c, message, fsub):
             chat_id=message.chat.id,
             text="**Please Join My Updates Channel to Use Me!**",
             reply_markup=InlineKeyboardMarkup(
-                [
-                    [
-                        InlineKeyboardButton("Join Now", url="https://t.me/harp_tech")
-                    ]
-                ]
-            )
+                [[InlineKeyboardButton("Join Now", url="https://t.me/harp_tech")]]
+            ),
         )
         return False
     except Exception as kk:
@@ -347,7 +361,9 @@ async def pyro_fsub(c, message, fsub):
             chat_id=message.chat.id,
             text="Something went Wrong. Contact my [Support Group](https://t.me/harp_chat).",
             parse_mode="markdown",
-            disable_web_page_preview=True)
+            disable_web_page_preview=True,
+        )
         return False
+
 
 print("> Bot Started ")
