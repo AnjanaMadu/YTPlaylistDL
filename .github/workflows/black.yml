@@ -1,0 +1,26 @@
+name: Code Reformat
+
+on:
+  workflow_dispatch:
+
+jobs:
+  
+  build:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Setup Python
+        uses: actions/setup-python@v3.0.0
+
+      - name: Install Black
+        run: |
+          pip install -U pip black
+
+      - name: Format Code
+        run: |
+          black "${GITHUB_WORKSPACE}"
+      
+      - name: Create Pull Request
+        uses: peter-evans/create-pull-request@v3.14.0
