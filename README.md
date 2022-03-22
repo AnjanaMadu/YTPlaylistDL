@@ -4,7 +4,7 @@ _A Telegram bot to download youtube playlists and upload them to telegram. (may 
 _🎯 Follow me and star this repo for more telegram bots._
 
 ## 📌 Features
-- Download Youtube Playlists AF
+- Download Youtube Playlists
 - Nothing Else.
 
 ## 📌 Deploy to Heroku
